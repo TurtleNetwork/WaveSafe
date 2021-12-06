@@ -10,12 +10,14 @@ import Footer from "./layouts/Footer";
 
 import Setting from "./layouts/Setting";
 import { ThemeContext } from "../context/ThemeContext";
-import Wizard from "./components/Forms/Wizard/Wizard";
+import CreateNewAddressWizard from "./createNewAddress/CreateNewAddressWizard";
+import InitializeTransaction from "./initializeTransaction/InitializeTransaction";
 
 const Markup = () => {
   const { menuToggle } = useContext(ThemeContext);
   const routes = [
-    { url: "createAddress", component: Wizard }
+    { url: "createAddress", component: CreateNewAddressWizard },
+    { url: "initTransaction", component: InitializeTransaction }
   ];
   let path = window.location.pathname;
   path = path.split("/");

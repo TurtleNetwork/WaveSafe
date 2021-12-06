@@ -66,11 +66,19 @@ const SideBar = () => {
             </Link>
           </li>
           <li>
-            <Link className="ai-icon" to="/signTransaction" >
+            <Link className="has-arrow ai-icon" to="#">
               <i className="flaticon-008-check"></i>
-              <span className="nav-text">Sign transaction</span>
+              <span className="nav-text forms">Transactions</span>
             </Link>
+            <ul >
+              <li>
+                <Link to="/initTransaction">
+                  Initialize transaction
+                </Link>
+              </li>
+            </ul>
           </li>
+
         </MM>
       </PerfectScrollbar>
     </div>

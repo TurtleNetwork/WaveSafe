@@ -11,8 +11,8 @@ export default class Header extends React.Component {
 
     if (name === 'createAddress') {
       finalName = 'Create multisig address';
-    } else if (name === 'signTransaction') {
-      finalName = 'Sign transaction'
+    } else if (name === 'initTransaction') {
+      finalName = 'Initialize transaction';
     }
     return (
         <div className="header">
