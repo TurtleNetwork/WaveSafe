@@ -13,7 +13,10 @@ export default class Header extends React.Component {
       finalName = 'Create multisig address';
     } else if (name === 'initTransaction') {
       finalName = 'Initialize transaction';
+    } else if (name === 'signJsonTransaction') {
+      finalName = 'Sign a transaction in JSON';
     }
+
     return (
         <div className="header">
           <div className="header-content">
