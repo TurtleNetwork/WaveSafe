@@ -4,6 +4,7 @@ import { Button, Row, Col, Card, Table } from "react-bootstrap";
 
 import Select from "react-select";
 
+import config from "../../conf/config";
 
 export default class AddAddressesStep extends React.Component {
 
@@ -21,7 +22,7 @@ export default class AddAddressesStep extends React.Component {
 
    async publicKeyChange(event) {
       const publicKey = event.target.value;
-      const publicKeyResponse = await fetch('https://nodes-testnet.wavesnodes.com/addresses/publicKey/' + publicKey);
+      const publicKeyResponse = await fetch(config.node + '/addresses/publicKey/' + publicKey);
       const publicKeyResponseJSON = await publicKeyResponse.json();
 
       if (publicKeyResponseJSON.error) {

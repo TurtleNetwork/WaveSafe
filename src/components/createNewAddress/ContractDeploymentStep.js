@@ -5,6 +5,8 @@ import { Button, Row, Col, Card, Table } from "react-bootstrap";
 import { Signer } from '@waves/signer';
 import { ProviderWeb } from '@waves.exchange/provider-web';
 
+import config from '../../conf/config';
+
 export default class ContractDeploymentStep extends React.Component {
 
    constructor(props, context) {
@@ -56,10 +58,10 @@ export default class ContractDeploymentStep extends React.Component {
    }
 
    async deployContract(compiledContract) {
-      const signer = new Signer({ NODE_URL: 'https://nodes-testnet.wavesnodes.com' });
+      const signer = new Signer({ NODE_URL: config.node });
       const data = { script: compiledContract};
 
-      signer.setProvider(new ProviderWeb('https://testnet.waves.exchange/signer/'));
+      signer.setProvider(new ProviderWeb(config.provider));
 
       await signer.setScript(data).broadcast();
    }
@@ -67,7 +69,7 @@ export default class ContractDeploymentStep extends React.Component {
    compileContract(contract, callback) {
       var xhr = new XMLHttpRequest();
 
-      xhr.open("POST", "https://nodes-testnet.wavesnodes.com/utils/script/compileCode", true);
+      xhr.open("POST", config.node + "/utils/script/compileCode", true);
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.setRequestHeader("Accept", "application/json");
 
@@ -78,7 +80,7 @@ export default class ContractDeploymentStep extends React.Component {
 
             callback(compiledScript);
          }
-      }
+      };
       xhr.send(contract);
    }
 

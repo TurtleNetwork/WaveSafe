@@ -5,6 +5,8 @@ import { Button, Modal } from 'react-bootstrap';
 import { Signer } from '@waves/signer';
 import { ProviderWeb } from '@waves.exchange/provider-web';
 
+import config from '../../conf/config';
+
 export default class SignJsonTransaction extends React.Component {
 
     constructor(props) {
@@ -18,11 +20,13 @@ export default class SignJsonTransaction extends React.Component {
     }
 
     async signTransaction() {
-        const signer = new Signer({ NODE_URL: 'https://nodes-testnet.wavesnodes.com' });
+        const signer = new Signer({ NODE_URL: config.node });
 
-        signer.setProvider(new ProviderWeb('https://testnet.waves.exchange/signer/'));
+        signer.setProvider(new ProviderWeb(config.provider));
 
         const signedTransaction = await signer.transfer(JSON.parse(this.state.jsonTransaction)).sign();
+        // strange enough: seems like signer is changing data type to string for fee!
+        signedTransaction.fee = parseInt(signedTransaction.fee);
         this.setState({ signedTransaction: signedTransaction, showSignedTransaction: true });
     };
 

@@ -5,6 +5,8 @@ import { Button } from "react-bootstrap";
 import { Signer } from '@waves/signer';
 import { ProviderWeb } from '@waves.exchange/provider-web';
 
+import config from '../../conf/config';
+
 export default class AddressAuthenticationStep extends React.Component {
 
     constructor(props, context) {
@@ -17,8 +19,8 @@ export default class AddressAuthenticationStep extends React.Component {
     }
 
     async authenticateAddress() {
-        const signer = new Signer({ NODE_URL: 'https://nodes-testnet.wavesnodes.com' });
-        signer.setProvider(new ProviderWeb('https://testnet.waves.exchange/signer/'));
+        const signer = new Signer({ NODE_URL: config.node });
+        signer.setProvider(new ProviderWeb(config.provider));
 
         const loginData = await signer.login();
         const address = loginData.address;

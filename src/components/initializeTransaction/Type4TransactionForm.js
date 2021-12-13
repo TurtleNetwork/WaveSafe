@@ -5,6 +5,8 @@ import { Button, Modal } from "react-bootstrap";
 import { Signer } from '@waves/signer';
 import { ProviderWeb } from '@waves.exchange/provider-web';
 
+import config from '../../conf/config';
+
 export default class Type4TransactionForm extends React.Component {
 
     constructor(props) {
@@ -28,10 +30,10 @@ export default class Type4TransactionForm extends React.Component {
     };
 
     async getAssets() {
-        const wavesBalanceResponse = await fetch('https://nodes-testnet.wavesnodes.com/addresses/balance/' + this.state.multisigAddress);
+        const wavesBalanceResponse = await fetch(config.node + '/addresses/balance/' + this.state.multisigAddress);
         const wavesBalance = await wavesBalanceResponse.json();
         const waves = wavesBalance.balance;
-        const assetsResponse = await fetch('https://nodes-testnet.wavesnodes.com/assets/balance/' + this.state.multisigAddress);
+        const assetsResponse = await fetch(config.node + '/assets/balance/' + this.state.multisigAddress);
         const assetsObject = await assetsResponse.json();
         const assets = assetsObject.balances;
         const sponsoredAssets = [];
@@ -89,10 +91,10 @@ export default class Type4TransactionForm extends React.Component {
     };
 
     async signTransaction() {
-        const signer = new Signer({ NODE_URL: 'https://nodes-testnet.wavesnodes.com' });
+        const signer = new Signer({ NODE_URL: config.node });
         var transfer = { amount: parseInt(this.state.amount), recipient: this.state.recipient, fee: 1000000 };
 
-        signer.setProvider(new ProviderWeb('https://testnet.waves.exchange/signer/'));
+        signer.setProvider(new ProviderWeb(config.provider));
 
         if (this.state.feeAsset !== '') {
             transfer.feeAssetId = this.state.feeAsset;

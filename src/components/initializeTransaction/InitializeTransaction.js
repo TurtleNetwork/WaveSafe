@@ -7,15 +7,21 @@ export default class InitializeTransaction extends React.Component {
     constructor(props) {
         super(props);
         var multisigWallets = JSON.parse(localStorage.getItem('multisigWallets'));
+        var walletNames = {};
 
         if (!multisigWallets) {
             multisigWallets = [];
         }
 
+        multisigWallets.forEach(multisigWallet => {
+            walletNames[multisigWallet] = localStorage.getItem(multisigWallet);
+        });
+
         this.state = {
             transactionComponent: null,
             multisigWallets: multisigWallets,
-            multisigAddress: ''
+            multisigAddress: '',
+            walletNames: walletNames
         };
     }
 
@@ -35,7 +41,7 @@ export default class InitializeTransaction extends React.Component {
         var multisigWalletOptions = [];
 
         this.state.multisigWallets.forEach(address => {
-            var newMultisigOption = <option value={ address }>{ address }</option>
+            var newMultisigOption = <option value={ address }>{ address } - { this.state.walletNames[address] }</option>
 
             multisigWalletOptions.push(newMultisigOption);
         });
