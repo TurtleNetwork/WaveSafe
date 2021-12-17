@@ -20,7 +20,17 @@ describe("multisig2_3 test suite", async function () {
 
   describe("test", () => {
     it("test", async function () {
-      console.log(randomUserAddress);
+      const txTransfer = transfer(
+        {
+          amount: 1,
+          recipient: randomUserAddress,
+          additionalFee: 400000,
+        },
+        accounts.dapp
+      );
+      await expect(broadcast(txTransfer)).rejectedWith(
+        "Transaction is not allowed by account-script"
+      );
     });
   });
 });
