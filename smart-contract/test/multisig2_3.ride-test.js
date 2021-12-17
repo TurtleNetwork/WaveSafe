@@ -18,8 +18,8 @@ describe("multisig2_3 test suite", async function () {
     dapp = address(accounts.dapp);
   });
 
-  describe("test", () => {
-    it("test", async function () {
+  describe("try to do tx", () => {
+    it("transfer is not allowed", async function () {
       const txTransfer = transfer(
         {
           amount: 1,
@@ -31,6 +31,17 @@ describe("multisig2_3 test suite", async function () {
       await expect(broadcast(txTransfer)).rejectedWith(
         "Transaction is not allowed by account-script"
       );
+    });
+    it("data tx is allowed", async function () {
+      const dataTx = data(
+        {
+          data: [{ key: "test", value: "test" }],
+          additionalFee: 400000,
+        },
+        accounts.dapp
+      );
+      await broadcast(dataTx);
+      await waitForTx(dataTx.id);
     });
   });
 });
