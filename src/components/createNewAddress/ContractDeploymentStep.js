@@ -18,26 +18,33 @@ export default class ContractDeploymentStep extends React.Component {
    createContract() {
       const names = [ 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eigth' ];
       var contract = '{-# STDLIB_VERSION 5 #-}\n' +
-          '{-# CONTENT_TYPE EXPRESSION #-}\n' +
+          '{-# CONTENT_TYPE DAPP #-}\n' +
           '{-# SCRIPT_TYPE ACCOUNT #-}\n' +
           '\n' +
+          '@Verifier(tx)\n' +
+          'func verify() = {\n' +
           '<publicKeyPart>\n' +
           '<signaturePart>\n' +
-          '<check>\n';
+          '<check>\n' +
+          '\n' +
+          '\tmatch (tx) {\n' +
+          '\t\tcase t: DataTransaction => signaturesCount >= 1\n' +
+          '\t\tcase _ => signaturesCount >= ' + this.parentState.minSignatures + '\n' +
+          '\t}\n' +
+          '}';
       var publicKeyPart = '';
       var signaturePart = '';
-      var checkPart = '';
+      var checkPart = '\tlet signaturesCount = ';
 
       for (var i = 0; i < this.parentState.addresses.length; i++) {
          const publicKey = this.parentState.addresses[i].publicKey;
          var check = names[i] + 'UserSigned + ';
-         var part = 'let ' + names[i] + 'User = base58\'' + publicKey + '\'\n';
+         var part = '\tlet ' + names[i] + 'User = base58\'' + publicKey + '\'\n';
 
          publicKeyPart += part;
          checkPart += check;
       }
       checkPart = checkPart.substring(0, checkPart.length - 3);
-      checkPart += ' >= ' + this.parentState.minSignatures;
 
       for (i = 0; i < this.parentState.addresses.length; i++) {
          var sigVerifyParts = '';
@@ -46,7 +53,7 @@ export default class ContractDeploymentStep extends React.Component {
             sigVerifyParts += sigVerifyPart;
          }
          sigVerifyParts = sigVerifyParts.substring(0, sigVerifyParts.length - 4);
-         var userPart = 'let ' + names[i] + 'UserSigned = if(' + sigVerifyParts + ') then 1 else 0\n';
+         var userPart = '\tlet ' + names[i] + 'UserSigned = if(' + sigVerifyParts + ') then 1 else 0\n';
 
          signaturePart += userPart
       }
@@ -86,6 +93,7 @@ export default class ContractDeploymentStep extends React.Component {
 
    confirmAndDeployContract() {
       const contract = this.createContract();
+
       this.compileContract(contract, (compiledContract) => {
          this.deployContract(compiledContract);
       });
