@@ -11,11 +11,11 @@
         "testnet": {
             "API_BASE": "https://nodes-testnet.wavesnodes.com/",
             "CHAIN_ID": "T",
-            "SEED": "gesture bubble opinion version tackle fun oak fatal leaf hidden process frown",
+            "SEED": "gesture bubble opinion version tackle fun oak fatal leaf hidden process frown sfsfs",
             "timeout": 60000
         }
     },
-    "defaultEnv": "custom",
+    "defaultEnv": "testnet",
     "mocha": {
         "timeout": 60000
     }
