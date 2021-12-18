@@ -4,9 +4,9 @@
 
 @Verifier(tx)
 func verify() = {
-    let firstUser = base58'9sH5dK4BBLgopo5ELRbvutccn41EZMqSSXfx96BxhLUm'
-    let secondUser = base58'Db9EPvRkCESu9i9AF1D2iTySokHPj3zoPJZGDumicFk4'
-    let thirdUser = base58'5XgxR3USe7zeHSY8FeeyGCcChqTHfTevb3NjmVwYqRkq'
+    let firstUser = base58'8RcC7vJKeW7W4t9h9RDaW6fSW8AwCdHiQSRQgEnYkWNG'
+    let secondUser = base58'7k9niHWH2k5HMhAM7aAL28BE5b6E25pmDL5aFYPuuGL4'
+    let thirdUser = base58'BpPsq6cFsjcimA2m68Pju4NLbckLaGZbRBXq5Y1dNCir'
 
     let firstUserSigned = if (sigVerify(tx.bodyBytes, tx.proofs[0], firstUser)) then 1
         else if (sigVerify(tx.bodyBytes, tx.proofs[1], firstUser)) then 1

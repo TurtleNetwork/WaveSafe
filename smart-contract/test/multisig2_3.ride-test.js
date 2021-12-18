@@ -2,7 +2,8 @@ const accountUtils = require("./utils/account.utils");
 const DappUtils = require("./utils/dapp.utils");
 
 let dapp;
-let randomUserAddress;
+const user2 = "bla die bloe dua dop^pozre";
+const user3 = "6465456 qkfishfihfiu";
 
 describe("multisig2_3 test suite", async function () {
   before(async function () {
@@ -10,12 +11,14 @@ describe("multisig2_3 test suite", async function () {
 
     await accountUtils.defineAccounts({
       dapp: 0.1,
-      randomUser: 0.1,
+      user2: 0.1,
+      user3: 0.1,
     });
 
     await DappUtils.setupDapp("multisig2_3.ride", "dapp");
-    randomUserAddress = address(accounts.randomUser);
     dapp = address(accounts.dapp);
+    console.log(accounts.dapp);
+    console.log(dapp);
   });
 
   describe("try to do tx", () => {
@@ -23,7 +26,7 @@ describe("multisig2_3 test suite", async function () {
       const txTransfer = transfer(
         {
           amount: 1,
-          recipient: randomUserAddress,
+          recipient: address(user2),
           additionalFee: 400000,
         },
         accounts.dapp
@@ -32,16 +35,79 @@ describe("multisig2_3 test suite", async function () {
         "Transaction is not allowed by account-script"
       );
     });
-    it("data tx is allowed", async function () {
-      const dataTx = data(
-        {
-          data: [{ key: "test", value: "test" }],
-          additionalFee: 400000,
-        },
-        accounts.dapp
-      );
-      await broadcast(dataTx);
-      await waitForTx(dataTx.id);
+    describe("data tx is allowed by 1 signer", () => {
+      it("First user", async function () {
+        const dataTx = data(
+          {
+            data: [{ key: "test1", value: "test" }],
+            additionalFee: 400000,
+          },
+          accounts.dapp
+        );
+        dataTx["proofs"] = [];
+        const SignedTx = signTx(dataTx);
+        await broadcast(SignedTx);
+        await waitForTx(SignedTx.id);
+      });
+      it("Second user", async function () {
+        const dataTx = data(
+          {
+            data: [{ key: "test2", value: "test" }],
+            additionalFee: 400000,
+          },
+          accounts.dapp
+        );
+        dataTx["proofs"] = [];
+        const SignedTx = signTx(dataTx, user2);
+        await broadcast(SignedTx);
+        await waitForTx(SignedTx.id);
+      });
+      it("Third user", async function () {
+        const dataTx = data(
+          {
+            data: [{ key: "test3", value: "test" }],
+            additionalFee: 400000,
+          },
+          accounts.dapp
+        );
+        dataTx["proofs"] = [];
+        const SignedTx = signTx(dataTx, user3);
+        await broadcast(SignedTx);
+        await waitForTx(SignedTx.id);
+      });
+    });
+    describe("data tx is allowed by 2 signer", () => {
+      it("2 users sign", async function () {
+        const dataTx = data(
+          {
+            data: [{ key: "test2sig", value: "test" }],
+            additionalFee: 400000,
+          },
+          accounts.dapp
+        );
+        dataTx["proofs"] = [];
+        let SignedTx = signTx(dataTx, user2);
+        SignedTx = signTx(SignedTx, user3);
+        await broadcast(SignedTx);
+        await waitForTx(SignedTx.id);
+      });
+    });
+    describe("data tx is allowed by 3 signer", () => {
+      it("3 users sign", async function () {
+        const dataTx = data(
+          {
+            data: [{ key: "test3sig", value: "test" }],
+            additionalFee: 400000,
+          },
+          accounts.dapp
+        );
+        dataTx["proofs"] = [];
+        let SignedTx = signTx(dataTx);
+        SignedTx = signTx(SignedTx, user2);
+        SignedTx = signTx(SignedTx, user3);
+        await broadcast(SignedTx);
+        await waitForTx(SignedTx.id);
+      });
     });
   });
 });
