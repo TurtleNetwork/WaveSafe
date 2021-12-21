@@ -13,11 +13,13 @@ import { ThemeContext } from "../context/ThemeContext";
 import CreateNewAddressWizard from "./createNewAddress/CreateNewAddressWizard";
 import InitializeTransaction from "./initializeTransaction/InitializeTransaction";
 import SignJsonTransaction from "./signJsonTransaction/SignJsonTransaction";
+import AddAddress from "./storeMultisigAddress/AddAddress";
 
 const Markup = () => {
   const { menuToggle } = useContext(ThemeContext);
   const routes = [
     { url: "createAddress", component: CreateNewAddressWizard },
+    { url: "addAddress", component: AddAddress },
     { url: "initTransaction", component: InitializeTransaction },
     { url: "signJsonTransaction", component: SignJsonTransaction }
   ];

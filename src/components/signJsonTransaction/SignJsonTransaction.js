@@ -7,6 +7,8 @@ import { ProviderWeb } from '@waves.exchange/provider-web';
 
 import config from '../../conf/config';
 
+import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
+
 export default class SignJsonTransaction extends React.Component {
 
     constructor(props) {
@@ -37,6 +39,22 @@ export default class SignJsonTransaction extends React.Component {
     closeModal() {
         this.setState({ showSignedTransaction: false });
     };
+
+    async storeTransaction() {
+        const wavesDataProtocol = new WavesDataProtocol();
+        const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
+        const signer = new Signer({ NODE_URL: config.node });
+        const tx = {
+            senderPublicKey: this.state.signedTransaction.senderPublicKey,
+            data: txData
+        };
+
+        signer.setProvider(new ProviderWeb(config.provider));
+
+        const signedTransaction = await signer.data(tx).sign();
+        console.log(signedTransaction);
+
+    }
 
     render() {
         return (
@@ -81,6 +99,12 @@ export default class SignJsonTransaction extends React.Component {
                         <pre>{ JSON.stringify(this.state.signedTransaction, 0, 4) }</pre>
                     </Modal.Body>
                     <Modal.Footer>
+                        <Button
+                            variant="primary light"
+                            onClick={() => this.storeTransaction() }
+                        >
+                            Store transaction
+                        </Button>
                         <Button
                             variant="danger light"
                             onClick={() => this.closeModal() }

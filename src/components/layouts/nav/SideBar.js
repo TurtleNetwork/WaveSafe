@@ -61,8 +61,14 @@ const SideBar = () => {
         <MM className="metismenu" id="menu">
           <li>
             <Link className="ai-icon" to="/createAddress" >
-              <i className="flaticon-066-plus"></i>
+              <i className="flaticon-084-share"></i>
               <span className="nav-text">Create multisig address</span>
+            </Link>
+          </li>
+          <li>
+            <Link className="ai-icon" to="/addAddress" >
+              <i className="flaticon-066-plus"></i>
+              <span className="nav-text">Add multisig address</span>
             </Link>
           </li>
           <li>
