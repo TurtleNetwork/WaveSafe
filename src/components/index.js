@@ -14,6 +14,7 @@ import CreateNewAddressWizard from "./createNewAddress/CreateNewAddressWizard";
 import InitializeTransaction from "./initializeTransaction/InitializeTransaction";
 import SignJsonTransaction from "./signJsonTransaction/SignJsonTransaction";
 import AddAddress from "./storeMultisigAddress/AddAddress";
+import SignStoredTransaction from "./signStoredTransactions/SignStoredTransaction";
 
 const Markup = () => {
   const { menuToggle } = useContext(ThemeContext);
@@ -21,7 +22,8 @@ const Markup = () => {
     { url: "createAddress", component: CreateNewAddressWizard },
     { url: "addAddress", component: AddAddress },
     { url: "initTransaction", component: InitializeTransaction },
-    { url: "signJsonTransaction", component: SignJsonTransaction }
+    { url: "signJsonTransaction", component: SignJsonTransaction },
+    { url: "signStoredTransaction", component: SignStoredTransaction }
   ];
   let path = window.location.pathname;
   path = path.split("/");

@@ -13,6 +13,7 @@ export default class ContractDeploymentStep extends React.Component {
       super(props, context);
 
       this.parentState = props.state;
+       console.log(this.parentState);
    }
 
    createContract() {
@@ -65,12 +66,18 @@ export default class ContractDeploymentStep extends React.Component {
    }
 
    async deployContract(compiledContract) {
-      const signer = new Signer({ NODE_URL: config.node });
-      const data = { script: compiledContract};
+       const signer = new Signer({ NODE_URL: config.node });
+       const data = { script: compiledContract};
 
-      signer.setProvider(new ProviderWeb(config.provider));
-
-      await signer.setScript(data).broadcast();
+       signer.setProvider(new ProviderWeb(config.provider));
+       const setScriptTx = await signer.setScript(data).broadcast();
+       const txData = [{ key: 'publicKey', type: 'string', value: setScriptTx.senderPublicKey }];
+       const tx = {
+           senderPublicKey: setScriptTx.senderPublicKey,
+           data: txData,
+           fee: 500000
+       };
+       await signer.data(tx).broadcast();
    }
 
    compileContract(contract, callback) {
@@ -95,7 +102,7 @@ export default class ContractDeploymentStep extends React.Component {
       const contract = this.createContract();
 
       this.compileContract(contract, (compiledContract) => {
-         this.deployContract(compiledContract);
+          this.deployContract(compiledContract);
       });
    }
 

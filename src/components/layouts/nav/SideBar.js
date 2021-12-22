@@ -83,6 +83,11 @@ const SideBar = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/signStoredTransaction">
+                  Sign stored transaction
+                </Link>
+              </li>
+              <li>
                 <Link to="/signJsonTransaction">
                   Sign JSON transaction
                 </Link>

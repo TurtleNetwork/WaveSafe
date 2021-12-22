@@ -51,9 +51,8 @@ export default class SignJsonTransaction extends React.Component {
 
         signer.setProvider(new ProviderWeb(config.provider));
 
-        const signedTransaction = await signer.data(tx).sign();
+        const signedTransaction = await signer.data(tx).broadcast();
         console.log(signedTransaction);
-
     }
 
     render() {

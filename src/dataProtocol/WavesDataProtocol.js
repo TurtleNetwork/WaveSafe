@@ -1,3 +1,5 @@
+import config from '../conf/config';
+
 export default class WavesDataProtocol {
 
     maxEntrySize = 100; //32767;
@@ -24,6 +26,49 @@ export default class WavesDataProtocol {
         }
 
         return dataEntries;
+    }
+
+    async getMultisigPublicKey(address) {
+        const multisigPublicKeyResponse = await fetch(config.node + '/addresses/data/' + address + '/publicKey');
+        const multisigPublicKey = await multisigPublicKeyResponse.json();
+
+        return multisigPublicKey.value;
+    }
+
+    async getTransaction(transactionCount, address) {
+        const count = transactionCount.value;
+        const identifier = transactionCount.key.substring(0, transactionCount.key.indexOf('_count'));
+        var tx = '';
+
+        for (var i = 0; i < count; i++) {
+            const part = await this.getValueForKey(address, identifier + '_' + i);
+
+            tx += part;
+        }
+
+        return JSON.parse(tx);
+    }
+
+    async getValueForKey(address, key) {
+        const response = await fetch(config.node + '/addresses/data/' + address + '/' + key);
+        const responseJSON = await response.json();
+
+        return responseJSON.value;
+    }
+
+    async getTransactionsForAddress(address) {
+        const transactionsResponse = await fetch(config.node + '/addresses/data/' + address + '?matches=.%2A_count');
+        const transactionCounts = await transactionsResponse.json();
+        const transactions = [];
+
+        for (var i = 0; i < transactionCounts.length; i++) {
+            const transactionCount = transactionCounts[i];
+            const tx = await this.getTransaction(transactionCount, address);
+
+            transactions.push(tx);
+        }
+
+        return transactions;
     }
 
 }

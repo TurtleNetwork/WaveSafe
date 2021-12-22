@@ -7,6 +7,8 @@ import { ProviderWeb } from '@waves.exchange/provider-web';
 
 import config from '../../conf/config';
 
+import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
+
 export default class Type4TransactionForm extends React.Component {
 
     constructor(props) {
@@ -90,9 +92,18 @@ export default class Type4TransactionForm extends React.Component {
         this.setState({ fee: fee * Math.pow(10, decimals) });
     };
 
+    async getMultisigPublicKey() {
+        const multisigPublicKeyResponse = await fetch(config.node + '/addresses/data/' + this.state.multisigAddress + '/publicKey');
+        const multisigPublicKey = await multisigPublicKeyResponse.json();
+        console.log(multisigPublicKey);
+
+        return multisigPublicKey.value;
+    }
+
     async signTransaction() {
         const signer = new Signer({ NODE_URL: config.node });
-        var transfer = { amount: parseInt(this.state.amount), recipient: this.state.recipient, fee: 1000000 };
+        const multisigPublicKey = await this.getMultisigPublicKey();
+        var transfer = { senderPublicKey: multisigPublicKey, amount: parseInt(this.state.amount), recipient: this.state.recipient, fee: 1000000 };
 
         signer.setProvider(new ProviderWeb(config.provider));
 
@@ -113,6 +124,21 @@ export default class Type4TransactionForm extends React.Component {
     closeModal() {
         this.setState({ showSignedTransaction: false });
     };
+
+    async storeTransaction() {
+        const senderPublicKey = await this.getMultisigPublicKey();
+        const wavesDataProtocol = new WavesDataProtocol();
+        const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
+        const signer = new Signer({ NODE_URL: config.node });
+        const tx = {
+            senderPublicKey: senderPublicKey,
+            data: txData
+        };
+
+        signer.setProvider(new ProviderWeb(config.provider));
+
+        await signer.data(tx).broadcast();
+    }
 
     render() {
         var assets = [];
@@ -212,11 +238,18 @@ export default class Type4TransactionForm extends React.Component {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button
+                            variant="primary light"
+                            onClick={() => this.storeTransaction() }
+                        >
+                            Store transaction
+                        </Button>
+                        <Button
                             variant="danger light"
                             onClick={() => this.closeModal() }
                         >
                             Close
                         </Button>
+
                     </Modal.Footer>
                 </Modal>
 
