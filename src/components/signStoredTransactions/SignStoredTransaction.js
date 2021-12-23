@@ -1,10 +1,10 @@
 import React, { Fragment } from "react";
 
-//import Type4TransactionRepresentation from "./Type4TransactionRepresentation";
+import Type4TransactionRepresentation from "./Type4TransactionRepresentation";
 
 import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
-import { Table } from "react-bootstrap";
+import { Button, Table } from "react-bootstrap";
 
 export default class SignStoredTransaction extends React.Component {
 
@@ -17,34 +17,38 @@ export default class SignStoredTransaction extends React.Component {
             multisigWallets = [];
         }
 
+        this.selectedTransactionComponentRef = React.createRef();
+
         multisigWallets.forEach(multisigWallet => {
             walletNames[multisigWallet] = localStorage.getItem(multisigWallet);
         });
 
         this.state = {
-            transactionComponent: null,
             multisigWallets: multisigWallets,
             multisigAddress: '',
             walletNames: walletNames,
-            transactions: []
+            transactions: [],
+            selectedTransaction: null
         };
     }
 
-    transactionTypeSelected(event) {
-        const type = event.target.value;
-
-        if (type === '4') {
-            //this.setState({ transactionComponent: <Type4TransactionRepresentation address={ this.state.multisigAddress }/> });
+    transactionSelected(tx) {
+        if (tx.type === 4) {
+            this.setState({ selectedTransaction: tx });
         }
     };
+
+    getSelectedTransactionComponent() {
+        if (this.state.selectedTransaction && this.state.selectedTransaction.type === 4) {
+            return <Type4TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ this.state.selectedTransaction} />;
+        }
+    }
 
     async multisigWalletSelected(event) {
         const dataProtocol = new WavesDataProtocol();
         const address = event.target.value;
-        this.setState({ multisigAddress: address });
-
         const transactions = await dataProtocol.getTransactionsForAddress(address);
-        this.setState({ transactions: transactions });
+        this.setState({ multisigAddress: address, transactions: transactions });
     };
 
     render() {
@@ -67,6 +71,14 @@ export default class SignStoredTransaction extends React.Component {
                 <tr key={ i }>
                     <td>{ tx.id }</td>
                     <td>{ map[tx.type] }</td>
+                    <td>
+                        <Button className="me-2" id={ i } variant="primary btn-rounded" onClick={ (event) => { this.transactionSelected(tx) } }>
+                            <span className="btn-icon-start text-primary">
+                                <i className="fa fa-minus" />
+                            </span>
+                            Sign
+                        </Button>
+                    </td>
                 </tr>
 
             transactionsTableEntries.push(txEntry);
@@ -90,6 +102,7 @@ export default class SignStoredTransaction extends React.Component {
                                 <th>
                                     <strong>Type</strong>
                                 </th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -101,6 +114,10 @@ export default class SignStoredTransaction extends React.Component {
             </div>
         </div>
 
+        const selectedTransactionComponent = this.getSelectedTransactionComponent();
+        if (this.selectedTransactionComponentRef.current) {
+            this.selectedTransactionComponentRef.current.setTx(this.state.selectedTransaction);
+        }
 
         return (
             <Fragment>
@@ -134,7 +151,7 @@ export default class SignStoredTransaction extends React.Component {
 
                 { this.state.transactions.length !== 0 ? transactionsComponent : "" }
 
-                { this.state.transactionComponent != null ? this.state.transactionComponent : "" }
+                { this.state.selectedTransaction != null ? selectedTransactionComponent : "" }
 
             </Fragment>
         );
