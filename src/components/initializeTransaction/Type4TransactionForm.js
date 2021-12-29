@@ -225,7 +225,7 @@ export default class Type4TransactionForm extends React.Component {
 
                 <Modal className="fade bd-example-modal-lg" size="lg" show={ this.state.showSignedTransaction }>
                     <Modal.Header>
-                        <Modal.Title>Modal title</Modal.Title>
+                        <Modal.Title>The signed transaction</Modal.Title>
                         <Button
                             variant=""
                             className="btn-close"

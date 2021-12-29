@@ -7,6 +7,8 @@ import { ProviderWeb } from '@waves.exchange/provider-web';
 
 import config from '../../conf/config';
 
+import MessageModal from '../modals/MessageModal';
+
 export default class ContractDeploymentStep extends React.Component {
 
    constructor(props, context) {
@@ -70,14 +72,19 @@ export default class ContractDeploymentStep extends React.Component {
        const data = { script: compiledContract};
 
        signer.setProvider(new ProviderWeb(config.provider));
-       const setScriptTx = await signer.setScript(data).broadcast();
-       const txData = [{ key: 'publicKey', type: 'string', value: setScriptTx.senderPublicKey }];
-       const tx = {
-           senderPublicKey: setScriptTx.senderPublicKey,
-           data: txData,
-           fee: 500000
-       };
-       await signer.data(tx).broadcast();
+       try {
+           const setScriptTx = await signer.setScript(data).broadcast();
+           const txData = [{ key: 'publicKey', type: 'string', value: setScriptTx.senderPublicKey }];
+           const tx = {
+               senderPublicKey: setScriptTx.senderPublicKey,
+               data: txData,
+               fee: 500000
+           };
+           await signer.data(tx).broadcast();
+       } catch (err) {
+           this.setState({ message: err.message, showMessageModal: true });
+       }
+       this.setState({ message: 'Address successfully transformed in a multisig address!', showMessageModal: true });
    }
 
    compileContract(contract, callback) {
@@ -154,23 +161,27 @@ export default class ContractDeploymentStep extends React.Component {
           </Row>
 
       return (
-          <section>
-             <h3>Please confirm:</h3>
-             The new multisig address will need at least <strong>{ this.parentState.minSignatures }</strong> signatures from the following addresses:
+          <div>
+              <section>
+                 <h3>Please confirm:</h3>
+                 The new multisig address will need at least <strong>{ this.parentState.minSignatures }</strong> signatures from the following addresses:
 
-             { table }
+                 { table }
 
-             <div className="row">
-                <div className="col-lg-3 mb-2">
-                   <div className="form-group mb-3">
-                      <Button className="me-2" variant="secondary" onClick={ () => { this.confirmAndDeployContract(); }}>
-                         Confirm and deploy contract
-                      </Button>
-                   </div>
-                </div>
-             </div>
+                 <div className="row">
+                    <div className="col-lg-3 mb-2">
+                       <div className="form-group mb-3">
+                          <Button className="me-2" variant="secondary" onClick={ () => { this.confirmAndDeployContract(); }}>
+                             Confirm and deploy contract
+                          </Button>
+                       </div>
+                    </div>
+                 </div>
+              </section>
 
-          </section>
+              { this.state && this.state.showMessageModal ? <MessageModal message={ this.state.message } /> : ''}
+
+          </div>
 
       );
 
