@@ -9,6 +9,8 @@ import config from '../../conf/config';
 
 import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
+import MessageModal from '../modals/MessageModal';
+
 export default class Type4TransactionForm extends React.Component {
 
     constructor(props) {
@@ -21,6 +23,7 @@ export default class Type4TransactionForm extends React.Component {
             assetDecimals: 0,
             feeAssetDecimals: 0
         };
+        this.modalRef = React.createRef()
 
         this.setTx(props.tx);
     };
@@ -35,12 +38,14 @@ export default class Type4TransactionForm extends React.Component {
     }
 
     async signTransaction() {
-        const signer = new Signer({ NODE_URL: config.node });
-        signer.setProvider(new ProviderWeb(config.provider));
+        try {
+            const signer = new Signer({ NODE_URL: config.node });
+            signer.setProvider(new ProviderWeb(config.provider));
 
-        console.log(this.state.tx);
-        const signedTransfer = await signer.transfer(this.state.tx).sign();
-        this.setState({ signedTransaction: signedTransfer, showSignedTransaction: true });
+            console.log(this.state.tx);
+            const signedTransfer = await signer.transfer(this.state.tx).sign();
+            this.setState({ signedTransaction: signedTransfer, showSignedTransaction: true });
+        } catch(err) { }
     };
 
     closeModal() {
@@ -48,18 +53,34 @@ export default class Type4TransactionForm extends React.Component {
     };
 
     async storeTransaction() {
-        const senderPublicKey = this.state.tx.senderPublicKey;
-        const wavesDataProtocol = new WavesDataProtocol();
-        const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
-        const signer = new Signer({ NODE_URL: config.node });
-        const tx = {
-            senderPublicKey: senderPublicKey,
-            data: txData
-        };
+        var error = false;
 
-        signer.setProvider(new ProviderWeb(config.provider));
+        try {
+            const senderPublicKey = this.state.tx.senderPublicKey;
+            const wavesDataProtocol = new WavesDataProtocol();
+            const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
+            const signer = new Signer({ NODE_URL: config.node });
+            const tx = {
+                senderPublicKey: senderPublicKey,
+                data: txData
+            };
 
-        await signer.data(tx).broadcast();
+            signer.setProvider(new ProviderWeb(config.provider));
+
+            await signer.data(tx).broadcast();
+        } catch(err) {
+            this.setState({ message: err.message, showMessageModal: true });
+            if (this.modalRef.current) {
+                this.modalRef.current.activateModal(this.state.message);
+            }
+            error = true;
+        }
+        if (!error) {
+            this.setState({ message: 'Transaction successfully stored!', showMessageModal: true });
+            if (this.modalRef.current) {
+                this.modalRef.current.activateModal(this.state.message);
+            }
+        }
     }
 
     async getAssetName(assetId) {
@@ -177,6 +198,8 @@ export default class Type4TransactionForm extends React.Component {
 
                     </Modal.Footer>
                 </Modal>
+
+                { this.state && this.state.showMessageModal ? <MessageModal ref={ this.modalRef } message={ this.state.message } /> : ''}
 
             </div>
         );

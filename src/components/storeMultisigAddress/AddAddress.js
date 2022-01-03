@@ -2,6 +2,8 @@ import React from "react";
 
 import { Button } from "react-bootstrap";
 
+import MessageModal from '../modals/MessageModal';
+
 export default class AddAddress extends React.Component {
 
    constructor(props, context) {
@@ -9,8 +11,11 @@ export default class AddAddress extends React.Component {
 
       this.state = {
          newAddress: '',
-         name: ''
+         name: '',
+         message: '',
+         showMessageModal: false
       };
+      this.modalRef = React.createRef()
    }
 
    storeAddress() {
@@ -19,6 +24,10 @@ export default class AddAddress extends React.Component {
       currentAddresses.push(this.state.newAddress);
       localStorage.setItem('multisigWallets', JSON.stringify(currentAddresses));
       localStorage.setItem(this.state.newAddress, this.state.name);
+      this.setState({ message: 'Address successfully stored locally!', showMessageModal: true });
+      if (this.modalRef.current) {
+         this.modalRef.current.activateModal(this.state.message);
+      }
    }
 
    nameChanged(event) {
@@ -82,7 +91,10 @@ export default class AddAddress extends React.Component {
                    </section>
                  </div>
             </div>
-        </div>
+
+            { this.state && this.state.showMessageModal ? <MessageModal ref={ this.modalRef } message={ this.state.message } /> : ''}
+
+           </div>
       );
 
    }

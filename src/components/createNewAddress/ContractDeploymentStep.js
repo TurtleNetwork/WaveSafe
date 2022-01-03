@@ -15,7 +15,6 @@ export default class ContractDeploymentStep extends React.Component {
       super(props, context);
 
       this.parentState = props.state;
-       console.log(this.parentState);
    }
 
    createContract() {
@@ -74,7 +73,10 @@ export default class ContractDeploymentStep extends React.Component {
        signer.setProvider(new ProviderWeb(config.provider));
        try {
            const setScriptTx = await signer.setScript(data).broadcast();
-           const txData = [{ key: 'publicKey', type: 'string', value: setScriptTx.senderPublicKey }];
+           const txData = [
+               { key: 'publicKey', type: 'string', value: setScriptTx.senderPublicKey },
+               { key: 'necessarySignatures', type: 'integer', value: this.parentState.minSignatures }
+           ];
            const tx = {
                senderPublicKey: setScriptTx.senderPublicKey,
                data: txData,

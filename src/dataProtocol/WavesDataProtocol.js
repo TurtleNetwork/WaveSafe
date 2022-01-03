@@ -6,7 +6,7 @@ export default class WavesDataProtocol {
 
     serializeData(tx) {
         const dataToSerialize = JSON.stringify(tx);
-        const identifier = tx.senderPublicKey + '_' + tx.id;
+        const identifier = tx.id; //tx.senderPublicKey + '_' + tx.id;
         const parts = Math.floor(dataToSerialize.length / this.maxEntrySize, 0) + 1;
         var dataEntries = [];
 

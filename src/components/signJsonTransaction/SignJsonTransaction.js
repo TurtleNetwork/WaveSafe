@@ -9,6 +9,8 @@ import config from '../../conf/config';
 
 import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
+import MessageModal from '../modals/MessageModal';
+
 export default class SignJsonTransaction extends React.Component {
 
     constructor(props) {
@@ -19,6 +21,7 @@ export default class SignJsonTransaction extends React.Component {
             signedTransaction: '',
             showSignedTransaction: false
         };
+        this.modalRef = React.createRef()
     }
 
     async signTransaction() {
@@ -41,18 +44,33 @@ export default class SignJsonTransaction extends React.Component {
     };
 
     async storeTransaction() {
-        const wavesDataProtocol = new WavesDataProtocol();
-        const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
-        const signer = new Signer({ NODE_URL: config.node });
-        const tx = {
-            senderPublicKey: this.state.signedTransaction.senderPublicKey,
-            data: txData
-        };
+        var error = false;
 
-        signer.setProvider(new ProviderWeb(config.provider));
+        try {
+            const wavesDataProtocol = new WavesDataProtocol();
+            const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
+            const signer = new Signer({ NODE_URL: config.node });
+            const tx = {
+                senderPublicKey: this.state.signedTransaction.senderPublicKey,
+                data: txData
+            };
 
-        const signedTransaction = await signer.data(tx).broadcast();
-        console.log(signedTransaction);
+            signer.setProvider(new ProviderWeb(config.provider));
+
+            await signer.data(tx).broadcast();
+        } catch(err) {
+            this.setState({ message: err.message, showMessageModal: true });
+            if (this.modalRef.current) {
+                this.modalRef.current.activateModal(this.state.message);
+            }
+            error = true;
+        }
+        if (!error) {
+            this.setState({ message: 'Transaction successfully stored!', showMessageModal: true });
+            if (this.modalRef.current) {
+                this.modalRef.current.activateModal(this.state.message);
+            }
+        }
     }
 
     render() {
@@ -112,6 +130,8 @@ export default class SignJsonTransaction extends React.Component {
                         </Button>
                     </Modal.Footer>
                 </Modal>
+
+                { this.state && this.state.showMessageModal ? <MessageModal ref={ this.modalRef } message={ this.state.message } /> : ''}
 
             </Fragment>
         );

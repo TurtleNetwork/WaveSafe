@@ -9,6 +9,8 @@ import config from '../../conf/config';
 
 import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
+import MessageModal from '../modals/MessageModal';
+
 export default class Type4TransactionForm extends React.Component {
 
     constructor(props) {
@@ -25,8 +27,11 @@ export default class Type4TransactionForm extends React.Component {
             feeAsset: '',
             fee: 100000,
             showSignedTransaction: false,
-            signedTransaction: ''
+            signedTransaction: '',
+            message: '',
+            showMessageModal: false
         };
+        this.modalRef = React.createRef()
 
         this.getAssets();
     };
@@ -126,18 +131,34 @@ export default class Type4TransactionForm extends React.Component {
     };
 
     async storeTransaction() {
-        const senderPublicKey = await this.getMultisigPublicKey();
-        const wavesDataProtocol = new WavesDataProtocol();
-        const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
-        const signer = new Signer({ NODE_URL: config.node });
-        const tx = {
-            senderPublicKey: senderPublicKey,
-            data: txData
-        };
+        var error = false;
 
-        signer.setProvider(new ProviderWeb(config.provider));
+        try {
+            const senderPublicKey = await this.getMultisigPublicKey();
+            const wavesDataProtocol = new WavesDataProtocol();
+            const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
+            const signer = new Signer({ NODE_URL: config.node });
+            const tx = {
+                senderPublicKey: senderPublicKey,
+                data: txData
+            };
 
-        await signer.data(tx).broadcast();
+            signer.setProvider(new ProviderWeb(config.provider));
+
+            await signer.data(tx).broadcast();
+        } catch(err) {
+            this.setState({ message: err.message, showMessageModal: true });
+            if (this.modalRef.current) {
+                this.modalRef.current.activateModal(this.state.message);
+            }
+            error = true;
+        }
+        if (!error) {
+            this.setState({ message: 'Transaction successfully stored!', showMessageModal: true });
+            if (this.modalRef.current) {
+                this.modalRef.current.activateModal(this.state.message);
+            }
+        }
     }
 
     render() {
@@ -252,6 +273,8 @@ export default class Type4TransactionForm extends React.Component {
 
                     </Modal.Footer>
                 </Modal>
+
+                { this.state && this.state.showMessageModal ? <MessageModal ref={ this.modalRef } message={ this.state.message } /> : ''}
 
             </div>
         );

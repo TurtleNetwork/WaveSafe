@@ -7,23 +7,25 @@ export default class MessageModel extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log('ErrorModal created!');
         this.state = {
             message: props.message,
             showMe: true
         }
-        console.log(props.errorMessage);
+    }
+
+    activateModal(message) {
+        this.setState({ message: message, showMe: true });
     }
 
     closeModal() {
-        this.setState({ errorMessage: '', showMe: false });
+        this.setState({ message: '', showMe: false });
     }
 
     render() {
         return (
             <Modal className="fade bd-example-modal-lg" size="lg" show={ this.state.showMe }>
                 <Modal.Header>
-                    <Modal.Title>Error</Modal.Title>
+                    <Modal.Title>Message</Modal.Title>
                     <Button
                         variant=""
                         className="btn-close"
