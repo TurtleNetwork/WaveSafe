@@ -43,7 +43,11 @@ export default class Type4TransactionForm extends React.Component {
             signer.setProvider(new ProviderWeb(config.provider));
 
             console.log(this.state.tx);
+            const oldId = this.state.tx.id;
             const signedTransfer = await signer.transfer(this.state.tx).sign();
+            signedTransfer.fee = parseInt(signedTransfer.fee);
+            signedTransfer.id = oldId;
+            console.log(signedTransfer);
             this.setState({ signedTransaction: signedTransfer, showSignedTransaction: true });
         } catch(err) { }
     };

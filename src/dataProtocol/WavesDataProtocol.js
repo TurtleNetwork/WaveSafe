@@ -63,9 +63,13 @@ export default class WavesDataProtocol {
 
         for (var i = 0; i < transactionCounts.length; i++) {
             const transactionCount = transactionCounts[i];
-            const tx = await this.getTransaction(transactionCount, address);
+            // TODO: dirty workaround since we don't know yet how to delete entries with signer, therefore, we just
+            // mark them with a length of -1. Polluting the data store! Bad!
+            if (transactionCount.value !== -1) {
+                const tx = await this.getTransaction(transactionCount, address);
 
-            transactions.push(tx);
+                transactions.push(tx);
+            }
         }
 
         return transactions;

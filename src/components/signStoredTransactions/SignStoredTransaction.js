@@ -4,7 +4,14 @@ import Type4TransactionRepresentation from "./Type4TransactionRepresentation";
 
 import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
+import { Signer } from '@waves/signer';
+import { ProviderWeb } from '@waves.exchange/provider-web';
+
 import { Button, Table } from "react-bootstrap";
+
+import config from '../../conf/config';
+
+import MessageModal from '../modals/MessageModal';
 
 export default class SignStoredTransaction extends React.Component {
 
@@ -23,12 +30,15 @@ export default class SignStoredTransaction extends React.Component {
             walletNames[multisigWallet] = localStorage.getItem(multisigWallet);
         });
 
+        this.modalRef = React.createRef()
+
         this.state = {
             multisigWallets: multisigWallets,
             multisigAddress: '',
             walletNames: walletNames,
             transactions: [],
-            selectedTransaction: null
+            selectedTransaction: null,
+            necessarySignaturesForAddress: 1000000
         };
     }
 
@@ -48,8 +58,70 @@ export default class SignStoredTransaction extends React.Component {
         const dataProtocol = new WavesDataProtocol();
         const address = event.target.value;
         const transactions = await dataProtocol.getTransactionsForAddress(address);
-        this.setState({ multisigAddress: address, transactions: transactions });
+        const necessarySignaturesForAddressResponse = await fetch(config.node + '/addresses/data/' + address + '/necessarySignatures');
+        const necessarySignaturesForAddressJSON = await necessarySignaturesForAddressResponse.json();
+        const necessarySignaturesForAddress = necessarySignaturesForAddressJSON.value;
+
+        this.setState({ multisigAddress: address, transactions: transactions, necessarySignaturesForAddress: necessarySignaturesForAddress });
     };
+
+    // TODO: should be changed to real deletion of the entries once we understood how to do that with signer. :)
+    async deleteTransactionEntry(id, senderPublicKey) {
+        const transactionCountResponse = await fetch(config.node + '/addresses/data/' + this.state.multisigAddress + '/' + id + '_count');
+        const transactionCountJSON = await transactionCountResponse.json();
+        const transactionCount = transactionCountJSON.value;
+        console.log(transactionCount);
+        const txData = [
+            {
+                key: id + '_count',
+                type: 'integer',
+                value: -1
+            }
+        ];
+        /*for (var i = 0; i < transactionCount; i++) {
+            txData.push({
+                key: id + '_' + i
+            });
+        }*/
+        const signer = new Signer({ NODE_URL: config.node });
+        const tx = {
+            senderPublicKey: senderPublicKey,
+            data: txData
+        };
+
+        signer.setProvider(new ProviderWeb(config.provider));
+
+        await signer.data(tx).broadcast();
+    }
+
+    broadcast(tx) {
+        const parent = this;
+        var xhr = new XMLHttpRequest();
+
+        xhr.open("POST", config.node + "/transactions/broadcast", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Accept", "application/json");
+
+        xhr.onreadystatechange = function() {
+            if(xhr.readyState === 4 && xhr.status === 200) {
+                const message = 'Transaction sucessfully broadcasted!';
+
+                parent.setState({ message: message, showMessageModal: true });
+                if (parent.modalRef.current) {
+                    parent.modalRef.current.activateModal(message);
+                }
+                parent.deleteTransactionEntry(tx.id, tx.senderPublicKey);
+            } else if (xhr.readyState === 4 && xhr.status >= 400) {
+                const message = JSON.parse(this.response).message;
+
+                parent.setState({ message: message, showMessageModal: true });
+                if (parent.modalRef.current) {
+                    parent.modalRef.current.activateModal(message);
+                }
+            }
+        };
+        xhr.send(JSON.stringify(tx));
+    }
 
     render() {
         const map = {
@@ -67,6 +139,18 @@ export default class SignStoredTransaction extends React.Component {
         var i = 0;
 
         this.state.transactions.forEach((tx) => {
+            var broadcastButton;
+
+            if (tx.proofs.length >= this.state.necessarySignaturesForAddress) {
+                broadcastButton = <Button className="me-2" id={ 'broadcast_' + i } variant="secondary btn-rounded" onClick={ (event) => { this.broadcast(tx) } }>
+                                    <span className="btn-icon-start text-primary">
+                                        <i className="fa fa-share" />
+                                    </span>
+                                    Broadcast
+                                </Button>;
+            } else {
+                broadcastButton = '';
+            }
             var txEntry =
                 <tr key={ i }>
                     <td>{ tx.id }</td>
@@ -78,6 +162,9 @@ export default class SignStoredTransaction extends React.Component {
                             </span>
                             Sign
                         </Button>
+                    </td>
+                    <td>
+                        { broadcastButton }
                     </td>
                 </tr>
 
@@ -102,6 +189,7 @@ export default class SignStoredTransaction extends React.Component {
                                 <th>
                                     <strong>Type</strong>
                                 </th>
+                                <th></th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -152,6 +240,8 @@ export default class SignStoredTransaction extends React.Component {
                 { this.state.transactions.length !== 0 ? transactionsComponent : "" }
 
                 { this.state.selectedTransaction != null ? selectedTransactionComponent : "" }
+
+                { this.state && this.state.showMessageModal ? <MessageModal ref={ this.modalRef } message={ this.state.message } /> : ''}
 
             </Fragment>
         );

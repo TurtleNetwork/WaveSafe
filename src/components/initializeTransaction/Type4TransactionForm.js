@@ -106,24 +106,28 @@ export default class Type4TransactionForm extends React.Component {
     }
 
     async signTransaction() {
-        const signer = new Signer({ NODE_URL: config.node });
-        const multisigPublicKey = await this.getMultisigPublicKey();
-        var transfer = { senderPublicKey: multisigPublicKey, amount: parseInt(this.state.amount), recipient: this.state.recipient, fee: 1000000 };
+        try {
+            const signer = new Signer({ NODE_URL: config.node });
+            const senderPublicKey = await this.getMultisigPublicKey();
+            var sender = this.state.multisigAddress;
+            var transfer = { senderPublicKey: senderPublicKey, sender: sender, amount: parseInt(this.state.amount), recipient: this.state.recipient, fee: 500000 };
 
-        signer.setProvider(new ProviderWeb(config.provider));
+            signer.setProvider(new ProviderWeb(config.provider));
 
-        if (this.state.feeAsset !== '') {
-            transfer.feeAssetId = this.state.feeAsset;
-            transfer.fee = parseInt(this.state.fee);
-        }
-        if (this.state.assetToSend !== '') {
-            transfer.assetId = this.state.assetToSend;
-        }
+            if (this.state.feeAsset !== '') {
+                transfer.feeAssetId = this.state.feeAsset;
+                transfer.fee = parseInt(this.state.fee);
+            }
+            if (this.state.assetToSend !== '') {
+                transfer.assetId = this.state.assetToSend;
+            }
 
-        const signedTransfer = await signer.transfer(transfer).sign();
-        // strange enough: seems like signer is changing data type to string for fee!
-        signedTransfer.fee = parseInt(this.state.fee);
-        this.setState({ signedTransaction: signedTransfer, showSignedTransaction: true });
+            console.log(transfer);
+            const signedTransfer = await signer.transfer(transfer).sign();
+            // strange enough: seems like signer is changing data type to string for fee!
+            signedTransfer.fee = parseInt(this.state.fee);
+            this.setState({ signedTransaction: signedTransfer, showSignedTransaction: true });
+        } catch(err) { }
     };
 
     closeModal() {
