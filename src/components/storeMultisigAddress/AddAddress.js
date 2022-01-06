@@ -19,8 +19,13 @@ export default class AddAddress extends React.Component {
    }
 
    storeAddress() {
-      var currentAddresses = JSON.parse(localStorage.getItem('multisigWallets'));
+      var currentAddresses;
 
+      if (!localStorage.getItem('multisigWallets')) {
+         currentAddresses = [];
+      } else {
+         currentAddresses = JSON.parse(localStorage.getItem('multisigWallets'));
+      }
       currentAddresses.push(this.state.newAddress);
       localStorage.setItem('multisigWallets', JSON.stringify(currentAddresses));
       localStorage.setItem(this.state.newAddress, this.state.name);
