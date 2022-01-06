@@ -87,7 +87,21 @@ export default class ContractDeploymentStep extends React.Component {
            this.setState({ message: err.message, showMessageModal: true });
        }
        this.setState({ message: 'Address successfully transformed in a multisig address!', showMessageModal: true });
+       this.storeAddressLocally();
    }
+
+    storeAddressLocally() {
+        var currentAddresses;
+
+        if (!localStorage.getItem('multisigWallets')) {
+            currentAddresses = [ this.parentState.addresses[0].address ];
+        } else {
+            currentAddresses = JSON.parse(localStorage.getItem('multisigWallets'));
+            currentAddresses.push(this.parentState.addresses[0].address);
+        }
+
+        localStorage.setItem('multisigWallets', JSON.stringify(currentAddresses))
+    }
 
    compileContract(contract, callback) {
       var xhr = new XMLHttpRequest();
