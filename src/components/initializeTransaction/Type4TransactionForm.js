@@ -122,7 +122,6 @@ export default class Type4TransactionForm extends React.Component {
                 transfer.assetId = this.state.assetToSend;
             }
 
-            console.log(transfer);
             const signedTransfer = await signer.transfer(transfer).sign();
             // strange enough: seems like signer is changing data type to string for fee!
             signedTransfer.fee = parseInt(this.state.fee);
