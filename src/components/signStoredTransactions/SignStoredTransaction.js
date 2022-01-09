@@ -1,6 +1,8 @@
 import React, { Fragment } from "react";
 
 import Type4TransactionRepresentation from "./Type4TransactionRepresentation";
+import Type8TransactionRepresentation from "./Type8TransactionRepresentation";
+import Type9TransactionRepresentation from "./Type9TransactionRepresentation";
 
 import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
@@ -38,21 +40,23 @@ export default class SignStoredTransaction extends React.Component {
             walletNames: walletNames,
             transactions: [],
             selectedTransaction: null,
-            necessarySignaturesForAddress: 1000000
+            necessarySignaturesForAddress: 1000000,
+            selectedTransactionComponent: null
         };
     }
 
     transactionSelected(tx) {
-        if (tx.type === 4) {
-            this.setState({ selectedTransaction: tx });
-        }
-    };
+        var selectedTransactionComponent;
 
-    getSelectedTransactionComponent() {
-        if (this.state.selectedTransaction && this.state.selectedTransaction.type === 4) {
-            return <Type4TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ this.state.selectedTransaction} />;
+        if (tx.type === 4) {
+            selectedTransactionComponent = <Type4TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
+        } else if (tx.type ===8) {
+            selectedTransactionComponent = <Type8TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
+        } else if (tx.type ===9) {
+            selectedTransactionComponent = <Type9TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         }
-    }
+        this.setState({ selectedTransaction: tx, selectedTransactionComponent: selectedTransactionComponent });
+    };
 
     async multisigWalletSelected(event) {
         const dataProtocol = new WavesDataProtocol();
@@ -62,36 +66,40 @@ export default class SignStoredTransaction extends React.Component {
         const necessarySignaturesForAddressJSON = await necessarySignaturesForAddressResponse.json();
         const necessarySignaturesForAddress = necessarySignaturesForAddressJSON.value;
 
-        this.setState({ multisigAddress: address, transactions: transactions, necessarySignaturesForAddress: necessarySignaturesForAddress });
+        this.setState({ multisigAddress: address, transactions: transactions, necessarySignaturesForAddress: necessarySignaturesForAddress, selectedTransactionComponent: null });
     };
 
     // TODO: should be changed to real deletion of the entries once we understood how to do that with signer. :)
     async deleteTransactionEntry(id, senderPublicKey) {
         const transactionCountResponse = await fetch(config.node + '/addresses/data/' + this.state.multisigAddress + '/' + id + '_count');
         const transactionCountJSON = await transactionCountResponse.json();
-        const transactionCount = transactionCountJSON.value;
-        console.log(transactionCount);
-        const txData = [
-            {
-                key: id + '_count',
-                type: 'integer',
-                value: -1
-            }
-        ];
-        /*for (var i = 0; i < transactionCount; i++) {
-            txData.push({
-                key: id + '_' + i
-            });
-        }*/
-        const signer = new Signer({ NODE_URL: config.node });
-        const tx = {
-            senderPublicKey: senderPublicKey,
-            data: txData
-        };
+        //const transactionCount = transactionCountJSON.value;
 
-        signer.setProvider(new ProviderWeb(config.provider));
+        try {
+            const txData = [
+                {
+                    key: id + '_count',
+                    type: 'integer',
+                    value: -1
+                }
+            ];
+            /*for (var i = 0; i < transactionCount; i++) {
+             txData.push({
+             key: id + '_' + i
+             });
+             }*/
+            const signer = new Signer({ NODE_URL: config.node });
+            const tx = {
+                senderPublicKey: senderPublicKey,
+                data: txData
+            };
 
-        await signer.data(tx).broadcast();
+            signer.setProvider(new ProviderWeb(config.provider));
+
+            await signer.data(tx).broadcast();
+        } catch(err) {
+            console.log(err);
+        }
     }
 
     broadcast(tx) {
@@ -124,8 +132,13 @@ export default class SignStoredTransaction extends React.Component {
     }
 
     render() {
+        if (this.selectedTransactionComponentRef.current) {
+            this.selectedTransactionComponentRef.current.setTx(this.state.selectedTransaction);
+        }
         const map = {
-            '4': 'Transfer'
+            '4': 'Transfer',
+            '8': 'Lease',
+            '9': 'Cancel lease'
         };
         var multisigWalletOptions = [];
 
@@ -202,10 +215,10 @@ export default class SignStoredTransaction extends React.Component {
             </div>
         </div>
 
-        const selectedTransactionComponent = this.getSelectedTransactionComponent();
+        /*const selectedTransactionComponent = this.getSelectedTransactionComponent();
         if (this.selectedTransactionComponentRef.current) {
             this.selectedTransactionComponentRef.current.setTx(this.state.selectedTransaction);
-        }
+        }*/
 
         return (
             <Fragment>
@@ -239,7 +252,7 @@ export default class SignStoredTransaction extends React.Component {
 
                 { this.state.transactions.length !== 0 ? transactionsComponent : "" }
 
-                { this.state.selectedTransaction != null ? selectedTransactionComponent : "" }
+                { this.state.selectedTransactionComponent != null ? this.state.selectedTransactionComponent : "" }
 
                 { this.state && this.state.showMessageModal ? <MessageModal ref={ this.modalRef } message={ this.state.message } /> : ''}
 
