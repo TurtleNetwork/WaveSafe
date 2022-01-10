@@ -6,6 +6,7 @@ import { Signer } from '@waves/signer';
 import { ProviderWeb } from '@waves.exchange/provider-web';
 
 import config from '../../conf/config';
+import AddressHelper from '../../helpers/AddressHelper';
 
 import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
@@ -24,6 +25,7 @@ export default class Type9TransactionForm extends React.Component {
             message: '',
             showMessageModal: false
         };
+        this.addressHelper = new AddressHelper();
         this.modalRef = React.createRef()
     };
 
@@ -31,18 +33,10 @@ export default class Type9TransactionForm extends React.Component {
         this.setState({ txId: event.target.value });
     };
 
-    async getMultisigPublicKey() {
-        const multisigPublicKeyResponse = await fetch(config.node + '/addresses/data/' + this.state.multisigAddress + '/publicKey');
-        const multisigPublicKey = await multisigPublicKeyResponse.json();
-        console.log(multisigPublicKey);
-
-        return multisigPublicKey.value;
-    }
-
     async signTransaction() {
         try {
             const signer = new Signer({ NODE_URL: config.node });
-            const senderPublicKey = await this.getMultisigPublicKey();
+            const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
             var sender = this.state.multisigAddress;
             var cancelLease = { senderPublicKey: senderPublicKey, sender: sender, leaseId: this.state.txId};
 
@@ -61,7 +55,7 @@ export default class Type9TransactionForm extends React.Component {
         var error = false;
 
         try {
-            const senderPublicKey = await this.getMultisigPublicKey();
+            const senderPublicKey = await await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
             const wavesDataProtocol = new WavesDataProtocol();
             const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
             const signer = new Signer({ NODE_URL: config.node });

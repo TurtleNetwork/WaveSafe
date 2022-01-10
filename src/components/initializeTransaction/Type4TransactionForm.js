@@ -6,6 +6,7 @@ import { Signer } from '@waves/signer';
 import { ProviderWeb } from '@waves.exchange/provider-web';
 
 import config from '../../conf/config';
+import AddressHelper from "../../helpers/AddressHelper"
 
 import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
@@ -33,6 +34,7 @@ export default class Type4TransactionForm extends React.Component {
         };
         this.modalRef = React.createRef()
 
+        this.addressHelper = new AddressHelper();
         this.getAssets();
     };
 
@@ -97,18 +99,10 @@ export default class Type4TransactionForm extends React.Component {
         this.setState({ fee: fee * Math.pow(10, decimals) });
     };
 
-    async getMultisigPublicKey() {
-        const multisigPublicKeyResponse = await fetch(config.node + '/addresses/data/' + this.state.multisigAddress + '/publicKey');
-        const multisigPublicKey = await multisigPublicKeyResponse.json();
-        console.log(multisigPublicKey);
-
-        return multisigPublicKey.value;
-    }
-
     async signTransaction() {
         try {
             const signer = new Signer({ NODE_URL: config.node });
-            const senderPublicKey = await this.getMultisigPublicKey();
+            const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
             var sender = this.state.multisigAddress;
             var transfer = { senderPublicKey: senderPublicKey, sender: sender, amount: parseInt(this.state.amount), recipient: this.state.recipient, fee: 500000 };
 
@@ -137,7 +131,7 @@ export default class Type4TransactionForm extends React.Component {
         var error = false;
 
         try {
-            const senderPublicKey = await this.getMultisigPublicKey();
+            const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
             const wavesDataProtocol = new WavesDataProtocol();
             const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
             const signer = new Signer({ NODE_URL: config.node });

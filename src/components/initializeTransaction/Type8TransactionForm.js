@@ -11,6 +11,8 @@ import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
 import MessageModal from '../modals/MessageModal';
 
+import AddressHelper from "../../helpers/AddressHelper"
+
 export default class Type8TransactionForm extends React.Component {
 
     constructor(props) {
@@ -26,6 +28,7 @@ export default class Type8TransactionForm extends React.Component {
             showMessageModal: false
         };
         this.modalRef = React.createRef()
+        this.addressHelper = new AddressHelper();
     };
 
     nodeChanged(event) {
@@ -38,24 +41,15 @@ export default class Type8TransactionForm extends React.Component {
         this.setState({ amount: amount * Math.pow(10, 8) });
     };
 
-    async getMultisigPublicKey() {
-        const multisigPublicKeyResponse = await fetch(config.node + '/addresses/data/' + this.state.multisigAddress + '/publicKey');
-        const multisigPublicKey = await multisigPublicKeyResponse.json();
-        console.log(multisigPublicKey);
-
-        return multisigPublicKey.value;
-    }
-
     async signTransaction() {
         try {
             const signer = new Signer({ NODE_URL: config.node });
-            const senderPublicKey = await this.getMultisigPublicKey();
+            const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
             var sender = this.state.multisigAddress;
             var lease = { senderPublicKey: senderPublicKey, sender: sender, amount: parseInt(this.state.amount), recipient: this.state.node };
 
             signer.setProvider(new ProviderWeb(config.provider));
 
-            console.log(lease);
             const signedTransfer = await signer.lease(lease).sign();
             this.setState({ signedTransaction: signedTransfer, showSignedTransaction: true });
         } catch(err) { }
@@ -69,7 +63,7 @@ export default class Type8TransactionForm extends React.Component {
         var error = false;
 
         try {
-            const senderPublicKey = await this.getMultisigPublicKey();
+            const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
             const wavesDataProtocol = new WavesDataProtocol();
             const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
             const signer = new Signer({ NODE_URL: config.node });
