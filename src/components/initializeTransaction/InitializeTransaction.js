@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
 
+import Type3TransactionForm from "./Type3TransactionForm";
 import Type4TransactionForm from "./Type4TransactionForm";
 import Type8TransactionForm from "./Type8TransactionForm";
 import Type9TransactionForm from "./Type9TransactionForm";
@@ -30,7 +31,9 @@ export default class InitializeTransaction extends React.Component {
     transactionTypeSelected(event) {
         const type = event.target.value;
 
-        if (type === '4') {
+        if (type === '3') {
+            this.setState({ transactionComponent: <Type3TransactionForm address={ this.state.multisigAddress }/> });
+        } else if (type === '4') {
             this.setState({ transactionComponent: <Type4TransactionForm address={ this.state.multisigAddress }/> });
         } else if (type === '8') {
             this.setState({ transactionComponent: <Type8TransactionForm address={ this.state.multisigAddress} />});
@@ -84,6 +87,7 @@ export default class InitializeTransaction extends React.Component {
                                         onChange={ (event) => { this.transactionTypeSelected(event); } }
                                     >
                                         <option value="0">Choose a transaction type</option>
+                                        <option value="3">Type 3 - Issue asset</option>
                                         <option value="4">Type 4 - Asset transfer</option>
                                         <option value="8">Type 8 - Lease</option>
                                         <option value="9">Type 9 - Cancel lease</option>

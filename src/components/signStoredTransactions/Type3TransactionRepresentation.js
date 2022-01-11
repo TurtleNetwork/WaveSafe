@@ -11,30 +11,24 @@ import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
 import MessageModal from '../modals/MessageModal';
 
-export default class Type4TransactionRepresentation extends React.Component {
+export default class Type3TransactionRepresentation extends React.Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            tx: '',
-            assetName: '',
-            feeAssetName: '',
-            assetDecimals: 0,
-            feeAssetDecimals: 0
+            tx: props.tx,
+            decompiledScript: ''
         };
         this.modalRef = React.createRef()
 
-        this.setTx(props.tx);
+        this.decompileScript(props.tx.script, decompiledScript => {
+            this.setState({ decompiledScript: decompiledScript });
+        });
     };
 
     async setTx(tx) {
-        const assetName = await this.getAssetName(tx.assetId);
-        const feeAssetName = await this.getAssetName(tx.feeAssetId);
-        const assetDecimals = await this.getAssetDecimal(tx.assetId);
-        const feeAssetDecimals = await this.getAssetDecimal(tx.feeAssetId);
-
-        this.setState({ tx: tx, assetName: assetName, feeAssetName: feeAssetName, assetDecimals: assetDecimals, feeAssetDecimals: feeAssetDecimals });
+        this.setState({ tx: tx });
     }
 
     async signTransaction() {
@@ -42,13 +36,10 @@ export default class Type4TransactionRepresentation extends React.Component {
             const signer = new Signer({ NODE_URL: config.node });
             signer.setProvider(new ProviderWeb(config.provider));
 
-            console.log(this.state.tx);
             const oldId = this.state.tx.id;
-            const signedTransfer = await signer.transfer(this.state.tx).sign();
-            signedTransfer.fee = parseInt(signedTransfer.fee);
-            signedTransfer.id = oldId;
-            console.log(signedTransfer);
-            this.setState({ signedTransaction: signedTransfer, showSignedTransaction: true });
+            const issueTransaction = await signer.issue(this.state.tx).sign();
+            issueTransaction.id = oldId;
+            this.setState({ signedTransaction: issueTransaction, showSignedTransaction: true });
         } catch(err) { }
     };
 
@@ -87,36 +78,23 @@ export default class Type4TransactionRepresentation extends React.Component {
         }
     }
 
-    async getAssetName(assetId) {
-        var name = '';
+    decompileScript(base64Script, callback) {
+        var xhr = new XMLHttpRequest();
 
-        if (!assetId) {
-            name = 'WAVES';
-        } else {
-            const assetResponse = await fetch(config.node + '/assets/details/' + assetId);
-            const asset = await assetResponse.json();
+        xhr.open("POST", config.node + "/utils/script/decompile", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Accept", "application/json");
 
-            name = asset.name;
-        }
+        xhr.onreadystatechange = function() {
+            if(xhr.readyState === 4 && xhr.status === 200) {
+                const scriptObject = JSON.parse(this.response);
+                const decompiledScript = scriptObject.script;
 
-        return name;
-    }
-
-    async getAssetDecimal(assetId) {
-        var decimals = 0;
-
-        if (!assetId) {
-            decimals = 8;
-        } else {
-            const assetResponse = await fetch(config.node + '/assets/details/' + assetId);
-            const asset = await assetResponse.json();
-
-            decimals = asset.decimals;
-        }
-
-        return decimals;
-    }
-
+                callback(decompiledScript);
+            }
+        };
+        xhr.send(base64Script);
+    };
 
     render() {
          return (
@@ -124,7 +102,7 @@ export default class Type4TransactionRepresentation extends React.Component {
                 <div className="col-xl-12 col-xxl-12">
                     <div className="card">
                         <div className="card-header">
-                            <h4 className="card-title">Transfer transaction to sign</h4>
+                            <h4 className="card-title">Token to issue</h4>
                         </div>
                         <div className="card-body">
                             <Table responsive>
@@ -144,24 +122,28 @@ export default class Type4TransactionRepresentation extends React.Component {
                                         <td>{ this.state.tx.id }</td>
                                     </tr>
                                     <tr key="1">
-                                        <td>Recipient</td>
-                                        <td>{ this.state.tx.recipient }</td>
+                                        <td>Name</td>
+                                        <td>{ this.state.tx.name }</td>
                                     </tr>
                                     <tr key="2">
-                                        <td>Amount</td>
-                                        <td>{ this.state.tx.amount / Math.pow(10, this.state.assetDecimals) }</td>
+                                        <td>Description</td>
+                                        <td>{ this.state.tx.description }</td>
                                     </tr>
                                     <tr key="3">
-                                        <td>Asset</td>
-                                        <td>{ this.state.assetName }</td>
+                                        <td>Quantity</td>
+                                        <td>{ this.state.tx.quantity }</td>
                                     </tr>
                                     <tr key="4">
-                                        <td>Fee asset</td>
-                                        <td>{ this.state.feeAssetName }</td>
+                                        <td>Decimals</td>
+                                        <td>{ this.state.tx.decimals }</td>
                                     </tr>
                                     <tr key="5">
-                                        <td>Fee</td>
-                                        <td>{ this.state.tx.fee / Math.pow(10, this.state.feeAssetDecimals) }</td>
+                                        <td>Reissuable</td>
+                                        <td>{ "" + this.state.tx.reissuable }</td>
+                                    </tr>
+                                    <tr key="6">
+                                        <td>Script</td>
+                                        <td>{ this.state.decompiledScript }</td>
                                     </tr>
                                 </tbody>
                             </Table>

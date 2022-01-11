@@ -11,7 +11,7 @@ import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
 import MessageModal from '../modals/MessageModal';
 
-export default class Type9TransactionForm extends React.Component {
+export default class Type9TransactionRepresentation extends React.Component {
 
     constructor(props) {
         super(props);

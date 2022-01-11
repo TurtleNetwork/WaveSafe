@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
 
+import Type3TransactionRepresentation from "./Type3TransactionRepresentation";
 import Type4TransactionRepresentation from "./Type4TransactionRepresentation";
 import Type8TransactionRepresentation from "./Type8TransactionRepresentation";
 import Type9TransactionRepresentation from "./Type9TransactionRepresentation";
@@ -48,7 +49,9 @@ export default class SignStoredTransaction extends React.Component {
     transactionSelected(tx) {
         var selectedTransactionComponent;
 
-        if (tx.type === 4) {
+        if (tx.type === 3) {
+            selectedTransactionComponent = <Type3TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
+        } else if (tx.type === 4) {
             selectedTransactionComponent = <Type4TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         } else if (tx.type ===8) {
             selectedTransactionComponent = <Type8TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
@@ -136,6 +139,7 @@ export default class SignStoredTransaction extends React.Component {
             this.selectedTransactionComponentRef.current.setTx(this.state.selectedTransaction);
         }
         const map = {
+            '3': 'Issue',
             '4': 'Transfer',
             '8': 'Lease',
             '9': 'Cancel lease'
