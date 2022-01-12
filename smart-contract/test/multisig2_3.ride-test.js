@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const accountUtils = require("./utils/account.utils");
 const DappUtils = require("./utils/dapp.utils");
 
@@ -22,7 +23,7 @@ describe("multisig2_3 test suite", async function () {
   });
 
   describe("try to do tx", () => {
-    it("transfer is not allowed", async function () {
+    it("transfer is not allowed by 1/3", async function () {
       const txTransfer = transfer(
         {
           amount: 1,
@@ -34,6 +35,21 @@ describe("multisig2_3 test suite", async function () {
       await expect(broadcast(txTransfer)).rejectedWith(
         "Transaction is not allowed by account-script"
       );
+    });
+    it("transfer is allowed with 2/3", async function () {
+      const txTransfer = transfer(
+        {
+          amount: 1,
+          recipient: address(user2),
+          additionalFee: 400000,
+        },
+        accounts.dapp
+      );
+      txTransfer["proofs"] = [];
+      let SignedTx = signTx(txTransfer, user2);
+      SignedTx = signTx(SignedTx, user3);
+      await broadcast(SignedTx);
+      await waitForTx(SignedTx.id);
     });
     describe("data tx is allowed by 1 signer", () => {
       it("First user", async function () {
