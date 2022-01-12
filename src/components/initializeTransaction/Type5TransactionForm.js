@@ -19,12 +19,9 @@ export default class Type3TransactionForm extends React.Component {
 
         this.state = {
             multisigAddress: props.address,
-            name: '',
-            decimals: 0,
+            assetId: '',
             quantity: 0,
             reissuable: false,
-            description: '',
-            script: null,
             showSignedTransaction: false,
             signedTransaction: '',
             message: '',
@@ -35,44 +32,19 @@ export default class Type3TransactionForm extends React.Component {
         this.addressHelper = new AddressHelper();
     };
 
-    nameChanged(event) {
-        this.setState({ name: event.target.value });
+    async assetIdChanged(event) {
+        const assetId = event.target.value;
+        const decimals = await this.getAssetDecimals(assetId);
+
+        this.setState({ assetId: assetId, decimals: decimals });
     };
 
-    descriptionChanged(event) {
-        this.setState({ description: event.target.value });
-    };
+    async getAssetDecimals(assetId) {
+        const assetInfo = await fetch(config.node + '/assets/details/' + assetId);
+        const assetInfoJSON = await assetInfo.json();
 
-    scriptChanged(event) {
-        this.compileScript(event.target.value, compiledContract => {
-            console.log(compiledContract);
-            if (compiledContract.startsWith('base64:')) {
-                this.setState({ script: compiledContract });
-            }
-        });
-    };
-
-    compileScript(script, callback) {
-        var xhr = new XMLHttpRequest();
-
-        xhr.open("POST", config.node + "/utils/script/compileCode", true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.setRequestHeader("Accept", "application/json");
-
-        xhr.onreadystatechange = function() {
-            if(xhr.readyState === 4 && xhr.status === 200) {
-                const scriptObject = JSON.parse(this.response);
-                const compiledScript = scriptObject.script;
-
-                callback(compiledScript);
-            }
-        };
-        xhr.send(script);
-    };
-
-    decimalsSelected(event) {
-        this.setState({ decimals: parseInt(event.target.value) });
-    };
+        return assetInfoJSON.decimals;
+    }
 
     reissuableSelected(event) {
         var reissuableString = event.target.value;
@@ -94,17 +66,17 @@ export default class Type3TransactionForm extends React.Component {
     };
 
     async signTransaction() {
-        try {
+        //try {
             const signer = new Signer({ NODE_URL: config.node });
             const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
-            var sender = this.state.multisigAddress;
-            var issue = { senderPublicKey: senderPublicKey, sender: sender, name: this.state.name, decimals: this.state.decimals, quantity: this.state.quantity * Math.pow(10, this.state.decimals), reissuable: this.state.reissuable, description: this.state.description, script: this.state.script };
+         var sender = this.state.multisigAddress;
+            var reIssue = { senderPublicKey: senderPublicKey, sender: sender, assetId: this.state.assetId, quantity: this.state.quantity * Math.pow(10, this.state.decimals), reissuable: this.state.reissuable };
 
             signer.setProvider(new ProviderWeb(config.provider));
 
-            const signedIssue = await signer.issue(issue).sign();
-            this.setState({ signedTransaction: signedIssue, showSignedTransaction: true });
-        } catch(err) { }
+            const signedReIssue = await signer.reissue(reIssue).sign();
+            this.setState({ signedTransaction: signedReIssue, showSignedTransaction: true });
+        //} catch(err) { }
     };
 
     closeModal() {
@@ -148,7 +120,7 @@ export default class Type3TransactionForm extends React.Component {
                 <div className="col-xl-12 col-xxl-12">
                     <div className="card">
                         <div className="card-header">
-                            <h4 className="card-title">Issue a new token</h4>
+                            <h4 className="card-title">Reissue a token</h4>
                         </div>
                         <div className="card-body">
                             <form
@@ -156,31 +128,14 @@ export default class Type3TransactionForm extends React.Component {
                                 id="step-form-horizontal"
                                 className="step-form-horizontal"
                             >
-                                <label className="text-label">Name</label>
+                                <label className="text-label">Asset ID</label>
                                 <input
                                     type="text"
-                                    name="recipient"
+                                    name="assetId"
                                     className="form-control"
-                                    onChange={ (event) => { this.nameChanged(event); } }
+                                    onChange={ (event) => { this.assetIdChanged(event); } }
                                     required
                                 />
-                                <br />
-                                <label className="text-label">Decimals</label>
-                                <select
-                                    defaultValue={"number of decimals"}
-                                    className="form-control form-control-lg"
-                                    onChange={ (event) => { this.decimalsSelected(event); } }
-                                >
-                                    <option value="0">0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                </select>
                                 <br />
                                 <label className="text-label">Quantity</label>
                                 <input
@@ -200,26 +155,6 @@ export default class Type3TransactionForm extends React.Component {
                                     <option value="false">false</option>
                                     <option value="true">true</option>
                                 </select>
-                                <br />
-                                <label className="text-label">Description</label>
-                                <textarea
-                                    rows="4"
-                                    style={{ height: '100%'}}
-                                    name="description"
-                                    className="form-control"
-                                    onChange={ (event) => { this.descriptionChanged(event); } }
-                                    required
-                                />
-                                <br />
-                                <label className="text-label">Script</label>
-                                <textarea
-                                    rows="10"
-                                    style={{ height: '100%'}}
-                                    name="script"
-                                    className="form-control"
-                                    onChange={ (event) => { this.scriptChanged(event); } }
-                                    required
-                                />
                                 <br />
                                 <Button className="me-2" variant="secondary" onClick={ () => { this.signTransaction(); }}>
                                     Sign transaction
