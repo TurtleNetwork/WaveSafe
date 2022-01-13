@@ -6,6 +6,7 @@ import Type5TransactionRepresentation from "./Type5TransactionRepresentation";
 import Type6TransactionRepresentation from "./Type6TransactionRepresentation";
 import Type8TransactionRepresentation from "./Type8TransactionRepresentation";
 import Type9TransactionRepresentation from "./Type9TransactionRepresentation";
+import Type10TransactionRepresentation from "./Type10TransactionRepresentation";
 
 import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
@@ -59,10 +60,12 @@ export default class SignStoredTransaction extends React.Component {
             selectedTransactionComponent = <Type5TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         } else if (tx.type === 6) {
             selectedTransactionComponent = <Type6TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
-        } else if (tx.type ===8) {
+        } else if (tx.type === 8) {
             selectedTransactionComponent = <Type8TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
-        } else if (tx.type ===9) {
+        } else if (tx.type === 9) {
             selectedTransactionComponent = <Type9TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
+        } else if (tx.type === 10) {
+            selectedTransactionComponent = <Type10TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         }
         this.setState({ selectedTransaction: tx, selectedTransactionComponent: selectedTransactionComponent });
     };
@@ -150,7 +153,8 @@ export default class SignStoredTransaction extends React.Component {
             '5': 'Reissue',
             '6': 'Burn',
             '8': 'Lease',
-            '9': 'Cancel lease'
+            '9': 'Cancel lease',
+            '10': 'Alias'
         };
         var multisigWalletOptions = [];
 
