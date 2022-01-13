@@ -3,6 +3,7 @@ import React, { Fragment } from "react";
 import Type3TransactionForm from "./Type3TransactionForm";
 import Type4TransactionForm from "./Type4TransactionForm";
 import Type5TransactionForm from "./Type5TransactionForm";
+import Type6TransactionForm from "./Type6TransactionForm";
 import Type8TransactionForm from "./Type8TransactionForm";
 import Type9TransactionForm from "./Type9TransactionForm";
 
@@ -38,6 +39,8 @@ export default class InitializeTransaction extends React.Component {
             this.setState({ transactionComponent: <Type4TransactionForm address={ this.state.multisigAddress }/> });
         } else if (type === '5') {
             this.setState({ transactionComponent: <Type5TransactionForm address={ this.state.multisigAddress }/> });
+        } else if (type === '6') {
+            this.setState({ transactionComponent: <Type6TransactionForm address={ this.state.multisigAddress }/> });
         } else if (type === '8') {
             this.setState({ transactionComponent: <Type8TransactionForm address={ this.state.multisigAddress} />});
         } else if (type === '9') {
@@ -93,6 +96,7 @@ export default class InitializeTransaction extends React.Component {
                                         <option value="3">Type 3 - Issue asset</option>
                                         <option value="4">Type 4 - Asset transfer</option>
                                         <option value="5">Type 5 - Reissue asset</option>
+                                        <option value="6">Type 6 - Burn tokens</option>
                                         <option value="8">Type 8 - Lease</option>
                                         <option value="9">Type 9 - Cancel lease</option>
                                     </select>

@@ -3,6 +3,7 @@ import React, { Fragment } from "react";
 import Type3TransactionRepresentation from "./Type3TransactionRepresentation";
 import Type4TransactionRepresentation from "./Type4TransactionRepresentation";
 import Type5TransactionRepresentation from "./Type5TransactionRepresentation";
+import Type6TransactionRepresentation from "./Type6TransactionRepresentation";
 import Type8TransactionRepresentation from "./Type8TransactionRepresentation";
 import Type9TransactionRepresentation from "./Type9TransactionRepresentation";
 
@@ -56,6 +57,8 @@ export default class SignStoredTransaction extends React.Component {
             selectedTransactionComponent = <Type4TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         } else if (tx.type === 5) {
             selectedTransactionComponent = <Type5TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
+        } else if (tx.type === 6) {
+            selectedTransactionComponent = <Type6TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         } else if (tx.type ===8) {
             selectedTransactionComponent = <Type8TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         } else if (tx.type ===9) {
@@ -145,6 +148,7 @@ export default class SignStoredTransaction extends React.Component {
             '3': 'Issue',
             '4': 'Transfer',
             '5': 'Reissue',
+            '6': 'Burn',
             '8': 'Lease',
             '9': 'Cancel lease'
         };

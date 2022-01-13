@@ -12,7 +12,7 @@ import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
 import MessageModal from '../modals/MessageModal';
 
-export default class Type5TransactionForm extends React.Component {
+export default class Type6TransactionForm extends React.Component {
 
     constructor(props) {
         super(props);
@@ -21,7 +21,6 @@ export default class Type5TransactionForm extends React.Component {
             multisigAddress: props.address,
             assetId: '',
             quantity: 0,
-            reissuable: false,
             showSignedTransaction: false,
             signedTransaction: '',
             message: '',
@@ -46,19 +45,6 @@ export default class Type5TransactionForm extends React.Component {
         return assetInfoJSON.decimals;
     }
 
-    reissuableSelected(event) {
-        var reissuableString = event.target.value;
-        var reissuable;
-
-        if (reissuableString === 'true') {
-            reissuable = true;
-        } else if (reissuableString === 'false') {
-            reissuable = false;
-        }
-
-        this.setState({ reissuable: reissuable });
-    };
-
     quantityChanged(event) {
         const quantity = parseFloat(event.target.value);
 
@@ -70,12 +56,12 @@ export default class Type5TransactionForm extends React.Component {
             const signer = new Signer({ NODE_URL: config.node });
             const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
             var sender = this.state.multisigAddress;
-            var reIssue = { senderPublicKey: senderPublicKey, sender: sender, assetId: this.state.assetId, quantity: this.state.quantity * Math.pow(10, this.state.decimals), reissuable: this.state.reissuable };
+            var burn = { senderPublicKey: senderPublicKey, sender: sender, assetId: this.state.assetId, amount: this.state.quantity * Math.pow(10, this.state.decimals) };
 
             signer.setProvider(new ProviderWeb(config.provider));
 
-            const signedReIssue = await signer.reissue(reIssue).sign();
-            this.setState({ signedTransaction: signedReIssue, showSignedTransaction: true });
+            const signedBurn = await signer.burn(burn).sign();
+            this.setState({ signedTransaction: signedBurn, showSignedTransaction: true });
         } catch(err) { }
     };
 
@@ -120,7 +106,7 @@ export default class Type5TransactionForm extends React.Component {
                 <div className="col-xl-12 col-xxl-12">
                     <div className="card">
                         <div className="card-header">
-                            <h4 className="card-title">Reissue a token</h4>
+                            <h4 className="card-title">Burn tokens</h4>
                         </div>
                         <div className="card-body">
                             <form
@@ -145,16 +131,6 @@ export default class Type5TransactionForm extends React.Component {
                                     onChange={ (event) => { this.quantityChanged(event); } }
                                     required
                                 />
-                                <br />
-                                <label className="text-label">Reissuable</label>
-                                <select
-                                    defaultValue={"Reissuable"}
-                                    className="form-control form-control-lg"
-                                    onChange={ (event) => { this.reissuableSelected(event); } }
-                                >
-                                    <option value="false">false</option>
-                                    <option value="true">true</option>
-                                </select>
                                 <br />
                                 <Button className="me-2" variant="secondary" onClick={ () => { this.signTransaction(); }}>
                                     Sign transaction
