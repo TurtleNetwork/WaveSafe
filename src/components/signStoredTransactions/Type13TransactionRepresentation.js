@@ -1,65 +1,45 @@
 import React from 'react';
 
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, Table } from "react-bootstrap";
 
 import { Signer } from '@waves/signer';
 import { ProviderWeb } from '@waves.exchange/provider-web';
 
 import config from '../../conf/config';
-import AddressHelper from "../../helpers/AddressHelper"
 
 import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
 import MessageModal from '../modals/MessageModal';
 
-export default class Type14TransactionForm extends React.Component {
+export default class Type13TransactionRepresentation extends React.Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            multisigAddress: props.address,
-            assetId: '',
-            decimals: 0,
-            sponsoringAmount: 0,
-            signedTransaction: '',
-            message: '',
-            showMessageModal: false
+            tx: props.tx,
+            decompiledScript: ''
         };
         this.modalRef = React.createRef()
 
-        this.addressHelper = new AddressHelper();
+        this.decompileScript(props.tx.script, decompiledScript => {
+            this.setState({ decompiledScript: decompiledScript });
+        });
     };
 
-    async assetIdChanged(event) {
-        const assetId = event.target.value;
-        const decimals = await this.getAssetDecimals(assetId);
-
-        this.setState({ assetId: assetId, decimals: decimals });
-    };
-
-    async getAssetDecimals(assetId) {
-        const assetInfo = await fetch(config.node + '/assets/details/' + assetId);
-        const assetInfoJSON = await assetInfo.json();
-
-        return assetInfoJSON.decimals;
-    }
-
-    sponsoringChanged(event) {
-        this.setState({ sponsoringAmount: parseFloat(event.target.value) });
+    async setTx(tx) {
+        this.setState({ tx: tx });
     }
 
     async signTransaction() {
         try {
             const signer = new Signer({ NODE_URL: config.node });
-            const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
-            var sender = this.state.multisigAddress;
-            var sponsor = { senderPublicKey: senderPublicKey, sender: sender, assetId: this.state.assetId, minSponsoredAssetFee: this.state.sponsoringAmount * Math.pow(10, this.state.decimals) };
-
             signer.setProvider(new ProviderWeb(config.provider));
 
-            const signedSponsoring = await signer.sponsorship(sponsor).sign();
-            this.setState({ signedTransaction: signedSponsoring, showSignedTransaction: true });
+            const oldId = this.state.tx.id;
+            const setScript = await signer.setScript(this.state.tx).sign();
+            setScript.id = oldId;
+            this.setState({ signedTransaction: setScript, showSignedTransaction: true });
         } catch(err) { }
     };
 
@@ -71,7 +51,7 @@ export default class Type14TransactionForm extends React.Component {
         var error = false;
 
         try {
-            const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
+            const senderPublicKey = this.state.tx.senderPublicKey;
             const wavesDataProtocol = new WavesDataProtocol();
             const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
             const signer = new Signer({ NODE_URL: config.node });
@@ -98,49 +78,66 @@ export default class Type14TransactionForm extends React.Component {
         }
     }
 
+    decompileScript(base64Script, callback) {
+        var xhr = new XMLHttpRequest();
+
+        xhr.open("POST", config.node + "/utils/script/decompile", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Accept", "application/json");
+
+        xhr.onreadystatechange = function() {
+            if(xhr.readyState === 4 && xhr.status === 200) {
+                const scriptObject = JSON.parse(this.response);
+                const decompiledScript = scriptObject.script;
+
+                callback(decompiledScript);
+            }
+        };
+        xhr.send(base64Script);
+    };
+
     render() {
-        return (
+         return (
             <div className="row">
                 <div className="col-xl-12 col-xxl-12">
                     <div className="card">
                         <div className="card-header">
-                            <h4 className="card-title">Create alias</h4>
+                            <h4 className="card-title">Set script</h4>
                         </div>
                         <div className="card-body">
-                            <form
-                                onSubmit={(e) => e.preventDefault()}
-                                id="step-form-horizontal"
-                                className="step-form-horizontal"
-                            >
-                                <label className="text-label">Asset ID</label>
-                                <input
-                                    type="text"
-                                    name="assetId"
-                                    className="form-control"
-                                    onChange={ (event) => { this.assetIdChanged(event); } }
-                                    required
-                                />
-                                <br />
-                                <label className="text-label">Min. sponsored asset fee</label>
-                                <input
-                                    type="number"
-                                    name="minSponsoredAssetFee"
-                                    className="form-control"
-                                    onChange={ (event) => { this.sponsoringChanged(event); } }
-                                    required
-                                />
-                                <br />
-                                <Button className="me-2" variant="secondary" onClick={ () => { this.signTransaction(); }}>
-                                    Sign transaction
-                                </Button>
-                            </form>
+                            <Table responsive>
+                                <thead>
+                                <tr>
+                                    <th className="width80">
+                                        <strong>Field</strong>
+                                    </th>
+                                    <th>
+                                        <strong>Value</strong>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <tr key="0">
+                                        <td>Id</td>
+                                        <td>{ this.state.tx.id }</td>
+                                    </tr>
+                                    <tr key="1">
+                                        <td>Script</td>
+                                        <td>{ this.state.decompiledScript }</td>
+                                    </tr>
+                                </tbody>
+                            </Table>
+                            <br />
+                            <Button className="me-2" variant="secondary" onClick={ () => { this.signTransaction(); }}>
+                                Sign transaction
+                            </Button>
                         </div>
                     </div>
                 </div>
 
                 <Modal className="fade bd-example-modal-lg" size="lg" show={ this.state.showSignedTransaction }>
                     <Modal.Header>
-                        <Modal.Title>The signed transaction</Modal.Title>
+                        <Modal.Title>Modal title</Modal.Title>
                         <Button
                             variant=""
                             className="btn-close"

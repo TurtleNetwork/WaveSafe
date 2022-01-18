@@ -45,7 +45,6 @@ export default class Type3TransactionForm extends React.Component {
 
     scriptChanged(event) {
         this.compileScript(event.target.value, compiledContract => {
-            console.log(compiledContract);
             if (compiledContract.startsWith('base64:')) {
                 this.setState({ script: compiledContract });
             }
