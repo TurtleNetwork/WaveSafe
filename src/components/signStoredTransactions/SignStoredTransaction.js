@@ -7,6 +7,7 @@ import Type6TransactionRepresentation from "./Type6TransactionRepresentation";
 import Type8TransactionRepresentation from "./Type8TransactionRepresentation";
 import Type9TransactionRepresentation from "./Type9TransactionRepresentation";
 import Type10TransactionRepresentation from "./Type10TransactionRepresentation";
+import Type11TransactionRepresentation from "./Type11TransactionRepresentation";
 import Type13TransactionRepresentation from "./Type13TransactionRepresentation";
 import Type14TransactionRepresentation from "./Type14TransactionRepresentation";
 
@@ -68,6 +69,8 @@ export default class SignStoredTransaction extends React.Component {
             selectedTransactionComponent = <Type9TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         } else if (tx.type === 10) {
             selectedTransactionComponent = <Type10TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
+        } else if (tx.type === 11) {
+            selectedTransactionComponent = <Type11TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         } else if (tx.type === 13) {
             selectedTransactionComponent = <Type13TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         } else if (tx.type === 14) {
@@ -120,8 +123,8 @@ export default class SignStoredTransaction extends React.Component {
         }
     }
 
-    broadcast(tx) {
-        const parent = this;
+    async broadcast(tx) {
+        /*const parent = this;
         var xhr = new XMLHttpRequest();
 
         xhr.open("POST", config.node + "/transactions/broadcast", true);
@@ -146,7 +149,23 @@ export default class SignStoredTransaction extends React.Component {
                 }
             }
         };
-        xhr.send(JSON.stringify(tx));
+        xhr.send(JSON.stringify(tx));*/
+        var message = '';
+        try {
+            const signer = new Signer({ NODE_URL: config.node });
+            const result = await signer.broadcast(tx);
+            console.log(result);
+
+
+            message = 'Transaction sucessfully broadcasted!';
+        } catch(err) {
+            message = err.message;
+        }
+        this.setState({ message: message, showMessageModal: true });
+        if (this.modalRef.current) {
+            this.modalRef.current.activateModal(message);
+        }
+        this.deleteTransactionEntry(tx.id, tx.senderPublicKey);
     }
 
     render() {
@@ -161,6 +180,7 @@ export default class SignStoredTransaction extends React.Component {
             '8': 'Lease',
             '9': 'Cancel lease',
             '10': 'Alias',
+            '11': 'Mass transfer',
             '13': 'Set script',
             '14': 'Sponsor asset'
         };
@@ -238,11 +258,6 @@ export default class SignStoredTransaction extends React.Component {
                 </div>
             </div>
         </div>
-
-        /*const selectedTransactionComponent = this.getSelectedTransactionComponent();
-        if (this.selectedTransactionComponentRef.current) {
-            this.selectedTransactionComponentRef.current.setTx(this.state.selectedTransaction);
-        }*/
 
         return (
             <Fragment>
