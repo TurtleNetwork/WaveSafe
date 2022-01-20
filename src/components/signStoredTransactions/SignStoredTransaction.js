@@ -10,6 +10,7 @@ import Type10TransactionRepresentation from "./Type10TransactionRepresentation";
 import Type11TransactionRepresentation from "./Type11TransactionRepresentation";
 import Type13TransactionRepresentation from "./Type13TransactionRepresentation";
 import Type14TransactionRepresentation from "./Type14TransactionRepresentation";
+import Type15TransactionRepresentation from "./Type15TransactionRepresentation";
 
 import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
@@ -75,6 +76,8 @@ export default class SignStoredTransaction extends React.Component {
             selectedTransactionComponent = <Type13TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         } else if (tx.type === 14) {
             selectedTransactionComponent = <Type14TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
+        } else if (tx.type === 15) {
+            selectedTransactionComponent = <Type15TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         }
         this.setState({ selectedTransaction: tx, selectedTransactionComponent: selectedTransactionComponent });
     };
@@ -182,7 +185,8 @@ export default class SignStoredTransaction extends React.Component {
             '10': 'Alias',
             '11': 'Mass transfer',
             '13': 'Set script',
-            '14': 'Sponsor asset'
+            '14': 'Sponsor asset',
+            '15': 'Set asset script'
         };
         var multisigWalletOptions = [];
 

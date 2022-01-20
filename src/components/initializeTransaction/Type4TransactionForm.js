@@ -26,7 +26,7 @@ export default class Type4TransactionForm extends React.Component {
             waves: 0,
             assetToSend: '',
             feeAsset: '',
-            fee: 100000,
+            fee: 500000,
             showSignedTransaction: false,
             signedTransaction: '',
             message: '',
