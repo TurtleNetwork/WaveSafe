@@ -11,6 +11,7 @@ import Type11TransactionForm from "./Type11TransactionForm";
 import Type13TransactionForm from "./Type13TransactionForm";
 import Type14TransactionForm from "./Type14TransactionForm";
 import Type15TransactionForm from "./Type15TransactionForm";
+import Type16TransactionForm from "./Type16TransactionForm";
 
 export default class InitializeTransaction extends React.Component {
 
@@ -60,6 +61,8 @@ export default class InitializeTransaction extends React.Component {
             this.setState({ transactionComponent: <Type14TransactionForm address={ this.state.multisigAddress} />});
         } else if (type === '15') {
             this.setState({ transactionComponent: <Type15TransactionForm address={ this.state.multisigAddress} />});
+        } else if (type === '16') {
+            this.setState({ transactionComponent: <Type16TransactionForm address={ this.state.multisigAddress} />});
         }
     };
 
@@ -119,6 +122,7 @@ export default class InitializeTransaction extends React.Component {
                                         <option value="13">Type 13 - Set script</option>
                                         <option value="14">Type 14 - Sponsor asset</option>
                                         <option value="15">Type 15 - Set asset script</option>
+                                        <option value="16">Type 16 - Invoke script</option>
                                     </select>
                                 </form>
                             </div>
