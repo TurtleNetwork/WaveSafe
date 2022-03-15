@@ -1,3 +1,5 @@
+var crypto = require("crypto");
+
 /* eslint-disable no-undef */
 const accountUtils = require("./utils/account.utils");
 const DappUtils = require("./utils/dapp.utils");
@@ -6,12 +8,25 @@ let dapp;
 const user2 = "bla die bloe dua dop^pozre";
 const user3 = "6465456 qkfishfihfiu";
 
+/**
+ * TODO tx types
+ * reissue
+ * burn
+ * Lease
+ * Lease cancel
+ * Alias
+ * Masstx
+ * Set Script
+ * Set sponsorship
+ * Set Asset script
+ * Invoke script
+ */
 describe("multisig2_3 test suite", async function () {
   before(async function () {
     this.timeout(0);
 
     await accountUtils.defineAccounts({
-      dapp: 0.1,
+      dapp: 1.1,
       user2: 0.1,
       user3: 0.1,
     });
@@ -49,6 +64,70 @@ describe("multisig2_3 test suite", async function () {
       let SignedTx = signTx(txTransfer, user2);
       SignedTx = signTx(SignedTx, user3);
       await broadcast(SignedTx);
+      await waitForTx(SignedTx.id);
+    });
+    it("alias is not allowed by 1/3", async function () {
+      const txTransfer = alias(
+        {
+          alias: crypto.randomBytes(10).toString("hex"),
+          recipient: address(user2),
+          additionalFee: 400000,
+        },
+        accounts.dapp
+      );
+      await expect(broadcast(txTransfer)).rejectedWith(
+        "Transaction is not allowed by account-script"
+      );
+    });
+    it("alias is allowed by 2/3", async function () {
+      const txTransfer = alias(
+        {
+          alias: crypto.randomBytes(10).toString("hex"),
+          recipient: address(user2),
+          additionalFee: 400000,
+        },
+        accounts.dapp
+      );
+      txTransfer["proofs"] = [];
+      let SignedTx = signTx(txTransfer, user2);
+      SignedTx = signTx(SignedTx, user3);
+      await broadcast(SignedTx).catch((e) => console.log(e));
+      await waitForTx(SignedTx.id);
+    });
+    it("issue is not allowed by 1/3", async function () {
+      const txTransfer = issue(
+        {
+          name: "test",
+          description: "test",
+          decimals: 0,
+          quantity: 1,
+          reissuable: true,
+          script: null,
+          additionalFee: 400000,
+        },
+        accounts.dapp
+      );
+      await expect(broadcast(txTransfer)).rejectedWith(
+        "Transaction is not allowed by account-script"
+      );
+    });
+    it("issue is allowed by 2/3", async function () {
+      const txTransfer = issue(
+        {
+          name: "test",
+          description: "test",
+          decimals: 0,
+          quantity: 1,
+          reissuable: true,
+          script: null,
+          additionalFee: 400000,
+        },
+        accounts.dapp
+      );
+      txTransfer["proofs"] = [];
+      let SignedTx = signTx(txTransfer, user2);
+      SignedTx = signTx(SignedTx, user3);
+      await broadcast(SignedTx).catch((e) => console.log(e));
       await waitForTx(SignedTx.id);
     });
     describe("data tx is allowed by 1 signer", () => {
