@@ -14,7 +14,6 @@ const user3 = "6465456 qkfishfihfiu";
  * burn
  * Lease
  * Lease cancel
- * Alias
  * Masstx
  * Set Script
  * Set sponsorship
@@ -64,34 +63,6 @@ describe("multisig2_3 test suite", async function () {
       let SignedTx = signTx(txTransfer, user2);
       SignedTx = signTx(SignedTx, user3);
       await broadcast(SignedTx);
-      await waitForTx(SignedTx.id);
-    });
-    it("alias is not allowed by 1/3", async function () {
-      const txTransfer = alias(
-        {
-          alias: crypto.randomBytes(10).toString("hex"),
-          recipient: address(user2),
-          additionalFee: 400000,
-        },
-        accounts.dapp
-      );
-      await expect(broadcast(txTransfer)).rejectedWith(
-        "Transaction is not allowed by account-script"
-      );
-    });
-    it("alias is allowed by 2/3", async function () {
-      const txTransfer = alias(
-        {
-          alias: crypto.randomBytes(10).toString("hex"),
-          recipient: address(user2),
-          additionalFee: 400000,
-        },
-        accounts.dapp
-      );
-      txTransfer["proofs"] = [];
-      let SignedTx = signTx(txTransfer, user2);
-      SignedTx = signTx(SignedTx, user3);
-      await broadcast(SignedTx).catch((e) => console.log(e));
       await waitForTx(SignedTx.id);
     });
     it("issue is not allowed by 1/3", async function () {
