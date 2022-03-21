@@ -43,12 +43,17 @@ export default class Type8TransactionForm extends React.Component {
 
     async signTransaction() {
         try {
-            const signer = new Signer({ NODE_URL: config.node });
             const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
             var sender = this.state.multisigAddress;
             var lease = { senderPublicKey: senderPublicKey, sender: sender, amount: parseInt(this.state.amount), recipient: this.state.node };
-
-            signer.setProvider(new ProviderWeb(config.provider));
+            var signer;
+            if (config.provider === '') {
+                signer = new Signer();
+                signer.setProvider(new ProviderWeb());
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                signer.setProvider(new ProviderWeb(config.provider));
+            }
 
             const signedTransfer = await signer.lease(lease).sign();
             this.setState({ signedTransaction: signedTransfer, showSignedTransaction: true });
@@ -66,13 +71,18 @@ export default class Type8TransactionForm extends React.Component {
             const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
             const wavesDataProtocol = new WavesDataProtocol();
             const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
-            const signer = new Signer({ NODE_URL: config.node });
             const tx = {
                 senderPublicKey: senderPublicKey,
                 data: txData
             };
-
-            signer.setProvider(new ProviderWeb(config.provider));
+            var signer;
+            if (config.provider === '') {
+                signer = new Signer();
+                signer.setProvider(new ProviderWeb());
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                signer.setProvider(new ProviderWeb(config.provider));
+            }
 
             await signer.data(tx).broadcast();
         } catch(err) {

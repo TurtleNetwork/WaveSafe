@@ -19,8 +19,14 @@ export default class AddressAuthenticationStep extends React.Component {
     }
 
     async authenticateAddress() {
-        const signer = new Signer({ NODE_URL: config.node });
-        signer.setProvider(new ProviderWeb(config.provider));
+        var signer;
+        if (config.provider === '') {
+            signer = new Signer();
+            signer.setProvider(new ProviderWeb());
+        } else {
+            signer = new Signer({ NODE_URL: config.node });
+            signer.setProvider(new ProviderWeb(config.provider));
+        }
 
         const loginData = await signer.login();
         const address = loginData.address;

@@ -101,12 +101,17 @@ export default class Type4TransactionForm extends React.Component {
 
     async signTransaction() {
         try {
-            const signer = new Signer({ NODE_URL: config.node });
             const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
             var sender = this.state.multisigAddress;
             var transfer = { senderPublicKey: senderPublicKey, sender: sender, amount: parseInt(this.state.amount), recipient: this.state.recipient, fee: 500000 };
-
-            signer.setProvider(new ProviderWeb(config.provider));
+            var signer;
+            if (config.provider === '') {
+                signer = new Signer();
+                signer.setProvider(new ProviderWeb());
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                signer.setProvider(new ProviderWeb(config.provider));
+            }
 
             if (this.state.feeAsset !== '') {
                 transfer.feeAssetId = this.state.feeAsset;
@@ -134,13 +139,18 @@ export default class Type4TransactionForm extends React.Component {
             const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
             const wavesDataProtocol = new WavesDataProtocol();
             const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
-            const signer = new Signer({ NODE_URL: config.node });
             const tx = {
                 senderPublicKey: senderPublicKey,
                 data: txData
             };
-
-            signer.setProvider(new ProviderWeb(config.provider));
+            var signer;
+            if (config.provider === '') {
+                signer = new Signer();
+                signer.setProvider(new ProviderWeb());
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                signer.setProvider(new ProviderWeb(config.provider));
+            }
 
             await signer.data(tx).broadcast();
         } catch(err) {

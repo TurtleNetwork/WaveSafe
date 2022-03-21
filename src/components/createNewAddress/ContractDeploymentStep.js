@@ -18,7 +18,7 @@ export default class ContractDeploymentStep extends React.Component {
    }
 
    createContract() {
-      const names = [ 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eigth' ];
+      const names = [ 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eigth', 'ninth', 'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fiftheenth', 'sixteenth' ];
       var contract = '{-# STDLIB_VERSION 5 #-}\n' +
           '{-# CONTENT_TYPE DAPP #-}\n' +
           '{-# SCRIPT_TYPE ACCOUNT #-}\n' +
@@ -63,14 +63,21 @@ export default class ContractDeploymentStep extends React.Component {
       contract = contract.replace('<publicKeyPart>', publicKeyPart);
       contract = contract.replace('<check>', checkPart);
 
+       console.log(contract);
       return contract;
    }
 
    async deployContract(compiledContract) {
-       const signer = new Signer({ NODE_URL: config.node });
        const data = { script: compiledContract};
+       var signer;
+       if (config.provider === '') {
+           signer = new Signer();
+           signer.setProvider(new ProviderWeb());
+       } else {
+           signer = new Signer({ NODE_URL: config.node });
+           signer.setProvider(new ProviderWeb(config.provider));
+       }
 
-       signer.setProvider(new ProviderWeb(config.provider));
        try {
            const setScriptTx = await signer.setScript(data).broadcast();
            const txData = [

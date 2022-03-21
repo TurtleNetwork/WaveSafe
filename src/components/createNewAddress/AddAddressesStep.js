@@ -84,7 +84,7 @@ export default class AddAddressesStep extends React.Component {
              </tr>
 
          addressEntries.push(addressEntry);
-         if (i < 8) {
+         if (i < 3) {
             options.push({ value: (i + 1), label: (i + 1) });
          }
          i++;

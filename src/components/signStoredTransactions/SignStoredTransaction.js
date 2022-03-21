@@ -6,7 +6,6 @@ import Type5TransactionRepresentation from "./Type5TransactionRepresentation";
 import Type6TransactionRepresentation from "./Type6TransactionRepresentation";
 import Type8TransactionRepresentation from "./Type8TransactionRepresentation";
 import Type9TransactionRepresentation from "./Type9TransactionRepresentation";
-import Type10TransactionRepresentation from "./Type10TransactionRepresentation";
 import Type11TransactionRepresentation from "./Type11TransactionRepresentation";
 import Type13TransactionRepresentation from "./Type13TransactionRepresentation";
 import Type14TransactionRepresentation from "./Type14TransactionRepresentation";
@@ -69,8 +68,6 @@ export default class SignStoredTransaction extends React.Component {
             selectedTransactionComponent = <Type8TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         } else if (tx.type === 9) {
             selectedTransactionComponent = <Type9TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
-        } else if (tx.type === 10) {
-            selectedTransactionComponent = <Type10TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         } else if (tx.type === 11) {
             selectedTransactionComponent = <Type11TransactionRepresentation ref={ this.selectedTransactionComponentRef } tx={ tx } />;
         } else if (tx.type === 13) {
@@ -115,13 +112,18 @@ export default class SignStoredTransaction extends React.Component {
              key: id + '_' + i
              });
              }*/
-            const signer = new Signer({ NODE_URL: config.node });
             const tx = {
                 senderPublicKey: senderPublicKey,
                 data: txData
             };
-
-            signer.setProvider(new ProviderWeb(config.provider));
+            var signer;
+            if (config.provider === '') {
+                signer = new Signer();
+                signer.setProvider(new ProviderWeb());
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                signer.setProvider(new ProviderWeb(config.provider));
+            }
 
             await signer.data(tx).broadcast();
         } catch(err) {
@@ -158,10 +160,15 @@ export default class SignStoredTransaction extends React.Component {
         xhr.send(JSON.stringify(tx));*/
         var message = '';
         try {
-            const signer = new Signer({ NODE_URL: config.node });
+            var signer;
+            if (config.provider === '') {
+                signer = new Signer();
+                signer.setProvider(new ProviderWeb());
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                signer.setProvider(new ProviderWeb(config.provider));
+            }
             const result = await signer.broadcast(tx);
-            console.log(result);
-
 
             message = 'Transaction sucessfully broadcasted!';
         } catch(err) {

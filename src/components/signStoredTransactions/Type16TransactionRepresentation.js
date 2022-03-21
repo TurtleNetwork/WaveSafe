@@ -44,8 +44,14 @@ export default class Type16TransactionRepresentation extends React.Component {
 
     async signTransaction() {
         try {
-            const signer = new Signer({ NODE_URL: config.node });
-            signer.setProvider(new ProviderWeb(config.provider));
+            var signer;
+            if (config.provider === '') {
+                signer = new Signer();
+                signer.setProvider(new ProviderWeb());
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                signer.setProvider(new ProviderWeb(config.provider));
+            }
 
             const oldId = this.state.tx.id;
             const signedInvoke = await signer.invoke(this.state.tx).sign();
@@ -65,13 +71,18 @@ export default class Type16TransactionRepresentation extends React.Component {
             const senderPublicKey = this.state.tx.senderPublicKey;
             const wavesDataProtocol = new WavesDataProtocol();
             const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
-            const signer = new Signer({ NODE_URL: config.node });
             const tx = {
                 senderPublicKey: senderPublicKey,
                 data: txData
             };
-
-            signer.setProvider(new ProviderWeb(config.provider));
+            var signer;
+            if (config.provider === '') {
+                signer = new Signer();
+                signer.setProvider(new ProviderWeb());
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                signer.setProvider(new ProviderWeb(config.provider));
+            }
 
             await signer.data(tx).broadcast();
         } catch(err) {

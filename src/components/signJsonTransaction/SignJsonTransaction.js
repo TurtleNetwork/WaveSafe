@@ -25,9 +25,14 @@ export default class SignJsonTransaction extends React.Component {
     }
 
     async signTransaction() {
-        const signer = new Signer({ NODE_URL: config.node });
-
-        signer.setProvider(new ProviderWeb(config.provider));
+        var signer;
+        if (config.provider === '') {
+            signer = new Signer();
+            signer.setProvider(new ProviderWeb());
+        } else {
+            signer = new Signer({ NODE_URL: config.node });
+            signer.setProvider(new ProviderWeb(config.provider));
+        }
 
         const signedTransaction = await signer.transfer(JSON.parse(this.state.jsonTransaction)).sign();
         // strange enough: seems like signer is changing data type to string for fee!
@@ -49,13 +54,18 @@ export default class SignJsonTransaction extends React.Component {
         try {
             const wavesDataProtocol = new WavesDataProtocol();
             const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
-            const signer = new Signer({ NODE_URL: config.node });
             const tx = {
                 senderPublicKey: this.state.signedTransaction.senderPublicKey,
                 data: txData
             };
-
-            signer.setProvider(new ProviderWeb(config.provider));
+            var signer;
+            if (config.provider === '') {
+                signer = new Signer();
+                signer.setProvider(new ProviderWeb());
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                signer.setProvider(new ProviderWeb(config.provider));
+            }
 
             await signer.data(tx).broadcast();
         } catch(err) {

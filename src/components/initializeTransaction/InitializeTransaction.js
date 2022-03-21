@@ -6,7 +6,6 @@ import Type5TransactionForm from "./Type5TransactionForm";
 import Type6TransactionForm from "./Type6TransactionForm";
 import Type8TransactionForm from "./Type8TransactionForm";
 import Type9TransactionForm from "./Type9TransactionForm";
-import Type10TransactionForm from "./Type10TransactionForm";
 import Type11TransactionForm from "./Type11TransactionForm";
 import Type13TransactionForm from "./Type13TransactionForm";
 import Type14TransactionForm from "./Type14TransactionForm";
@@ -51,8 +50,6 @@ export default class InitializeTransaction extends React.Component {
             this.setState({ transactionComponent: <Type8TransactionForm address={ this.state.multisigAddress} />});
         } else if (type === '9') {
             this.setState({ transactionComponent: <Type9TransactionForm address={ this.state.multisigAddress} />});
-        } else if (type === '10') {
-            this.setState({ transactionComponent: <Type10TransactionForm address={ this.state.multisigAddress} />});
         } else if (type === '11') {
             this.setState({ transactionComponent: <Type11TransactionForm address={ this.state.multisigAddress} />});
         } else if (type === '13') {
@@ -117,7 +114,6 @@ export default class InitializeTransaction extends React.Component {
                                         <option value="6">Type 6 - Burn tokens</option>
                                         <option value="8">Type 8 - Lease</option>
                                         <option value="9">Type 9 - Cancel lease</option>
-                                        <option value="10">Type 10 - Create alias</option>
                                         <option value="11">Type 11 - Mass transfer</option>
                                         <option value="13">Type 13 - Set script</option>
                                         <option value="14">Type 14 - Sponsor asset</option>

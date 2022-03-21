@@ -51,12 +51,17 @@ export default class Type14TransactionForm extends React.Component {
 
     async signTransaction() {
         try {
-            const signer = new Signer({ NODE_URL: config.node });
             const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
             var sender = this.state.multisigAddress;
             var sponsor = { senderPublicKey: senderPublicKey, sender: sender, assetId: this.state.assetId, minSponsoredAssetFee: this.state.sponsoringAmount * Math.pow(10, this.state.decimals) };
-
-            signer.setProvider(new ProviderWeb(config.provider));
+            var signer;
+            if (config.provider === '') {
+                signer = new Signer();
+                signer.setProvider(new ProviderWeb());
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                signer.setProvider(new ProviderWeb(config.provider));
+            }
 
             const signedSponsoring = await signer.sponsorship(sponsor).sign();
             this.setState({ signedTransaction: signedSponsoring, showSignedTransaction: true });
@@ -74,13 +79,18 @@ export default class Type14TransactionForm extends React.Component {
             const senderPublicKey = await this.addressHelper.getMultisigPublicKey(this.state.multisigAddress);
             const wavesDataProtocol = new WavesDataProtocol();
             const txData = wavesDataProtocol.serializeData(this.state.signedTransaction);
-            const signer = new Signer({ NODE_URL: config.node });
             const tx = {
                 senderPublicKey: senderPublicKey,
                 data: txData
             };
-
-            signer.setProvider(new ProviderWeb(config.provider));
+            var signer;
+            if (config.provider === '') {
+                signer = new Signer();
+                signer.setProvider(new ProviderWeb());
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                signer.setProvider(new ProviderWeb(config.provider));
+            }
 
             await signer.data(tx).broadcast();
         } catch(err) {
