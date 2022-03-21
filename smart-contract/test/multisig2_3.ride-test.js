@@ -319,7 +319,7 @@ describe("multisig2_3 test suite", async function () {
       const txTransfer = lease(
         {
           amount: 1,
-          recipient: "3N4XePZG7AcqehJCnUH4J7uUqpqAn3uc7XU",
+          recipient: address(user2),
           additionalFee: 400000,
         },
         accounts.dapp
@@ -334,7 +334,7 @@ describe("multisig2_3 test suite", async function () {
       const txTransfer = lease(
         {
           amount: 1,
-          recipient: "3N4XePZG7AcqehJCnUH4J7uUqpqAn3uc7XU",
+          recipient: address(user2),
           additionalFee: 400000,
         },
         accounts.dapp
@@ -378,9 +378,7 @@ describe("multisig2_3 test suite", async function () {
     it("massTransfer is not allowed by 1/3", async function () {
       const txTransfer = massTransfer(
         {
-          transfers: [
-            { recipient: "3N4XePZG7AcqehJCnUH4J7uUqpqAn3uc7XU", amount: 1 },
-          ],
+          transfers: [{ recipient: address(user2), amount: 1 }],
           additionalFee: 400000,
         },
         accounts.dapp
@@ -393,9 +391,7 @@ describe("multisig2_3 test suite", async function () {
     it("massTransfer is allowed by 2/3", async function () {
       const txTransfer = massTransfer(
         {
-          transfers: [
-            { recipient: "3N4XePZG7AcqehJCnUH4J7uUqpqAn3uc7XU", amount: 1 },
-          ],
+          transfers: [{ recipient: address(user2), amount: 1 }],
           additionalFee: 400000,
         },
         accounts.dapp
