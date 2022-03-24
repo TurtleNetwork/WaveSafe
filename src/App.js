@@ -9,6 +9,7 @@ import "./vendor/bootstrap-select/dist/css/bootstrap-select.min.css";
 import "./css/style.css";
 
 function App (props) {
+
     const dispatch = useDispatch();
     useEffect(() => {
     }, [dispatch, props.history]);
