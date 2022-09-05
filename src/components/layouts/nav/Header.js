@@ -19,6 +19,8 @@ export default class Header extends React.Component {
       finalName = 'Add a new multisig address';
     } else if (name === 'signStoredTransaction') {
       finalName = 'Sign stored transaction';
+    } else if (name === 'usdn') {
+      finalName = 'USDN Transactions';
     }
 
     return (

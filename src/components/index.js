@@ -15,6 +15,7 @@ import InitializeTransaction from "./initializeTransaction/InitializeTransaction
 import SignJsonTransaction from "./signJsonTransaction/SignJsonTransaction";
 import AddAddress from "./storeMultisigAddress/AddAddress";
 import SignStoredTransaction from "./signStoredTransactions/SignStoredTransaction";
+import USDN from "./dapps/usdn/USDN";
 import {Button, Modal} from "react-bootstrap";
 
 class Disclaimer extends React.Component {
@@ -65,7 +66,8 @@ const Markup = (  ) => {
     { url: "addAddress", component: AddAddress },
     { url: "initTransaction", component: InitializeTransaction },
     { url: "signJsonTransaction", component: SignJsonTransaction },
-    { url: "signStoredTransaction", component: SignStoredTransaction }
+    { url: "signStoredTransaction", component: SignStoredTransaction },
+    { url: "usdn", component: USDN }
   ];
   let path = window.location.pathname;
   path = path.split("/");

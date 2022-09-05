@@ -7,6 +7,37 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import { Link } from "react-router-dom";
 import useScrollPosition from "use-scroll-position";
 import { ThemeContext } from "../../../context/ThemeContext";
+import config from '../../../conf/config';
+
+class NetworkSelector extends Component {
+
+  constructor() {
+    super();
+
+    this.networks = {
+      'Testnet': 'https://testnet.wavesafe.io',
+      'Mainnet': 'https://beta.wavesafe.io'
+    };
+  }
+
+  switchNetwork(event) {
+    window.location.href = this.networks[event.target.value];
+  };
+
+  render() {
+    return (
+        <select
+            defaultValue={ config.network }
+            className="form-control form-control-lg"
+            onChange={ (event) => { this.switchNetwork(event)} }
+        >
+          <option value="Mainnet">Mainnet</option>
+          <option value="Testnet">Testnet</option>
+        </select>
+    );
+  };
+
+}
 
 class MM extends Component {
   componentDidMount() {
@@ -60,6 +91,9 @@ const SideBar = () => {
       <PerfectScrollbar className="dlabnav-scroll">
         <MM className="metismenu" id="menu">
           <li>
+            <NetworkSelector />
+          </li>
+          <li>
             <Link className="ai-icon" to="/createAddress" >
               <i className="flaticon-084-share"></i>
               <span className="nav-text">Create multisig address</span>
@@ -94,8 +128,22 @@ const SideBar = () => {
               </li>
             </ul>
           </li>
+          <li>
+            <Link className="has-arrow ai-icon" to="#">
+              <i className="flaticon-381-fast-forward-1"></i>
+              <span className="nav-text forms">dApps</span>
+            </Link>
+            <ul >
+              <li>
+                <Link to="/usdn">
+                  USDN
+                </Link>
+              </li>
+            </ul>
+          </li>
 
         </MM>
+
       </PerfectScrollbar>
     </div>
   );
