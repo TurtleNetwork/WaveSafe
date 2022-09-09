@@ -52,7 +52,7 @@ export default class StakeSURF extends React.Component {
         var surfAssetId = ''
 
         if (config.network === 'Testnet') {
-            dApp = '3MuGfNhF98CNBCfthhoJEo6SYUv7zTgkK4J'
+            dApp = '3N5yarEiTQccnnuerogYT3BxM5Zc5bRgDZy'
             surfAssetId = 'AQHdcKm9R1rBLZRWxFqnvqgGR6GnFqrKsmJCpyNfgiyt';
         } else {
             dApp = '3PBiotFpqjRMkkeFBccnQNUXUopy7KFez5C';
