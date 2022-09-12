@@ -53,6 +53,18 @@ export default class SignStoredTransaction extends React.Component {
         };
     }
 
+    componentDidMount() {
+        var parent = this;
+        this.interval = setInterval(async function() {
+            await parent.multisigWalletSelectedInterval();
+            parent.setState({ time: Date.now() });
+        }, 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
+    }
+
     transactionSelected(tx) {
         var selectedTransactionComponent;
 
@@ -93,6 +105,21 @@ export default class SignStoredTransaction extends React.Component {
         this.setState({ multisigAddress: address, transactions: transactions, necessarySignaturesForAddress: necessarySignaturesForAddress, selectedTransactionComponent: null });
     };
 
+    async multisigWalletSelectedInterval() {
+        const dataProtocol = new WavesDataProtocol();
+        const address = this.state.multisigAddress;
+        const transactions = await dataProtocol.getTransactionsForAddress(address);
+        const necessarySignaturesForAddressResponse = await fetch(config.node + '/addresses/data/' + address + '/necessarySignatures');
+        const necessarySignaturesForAddressJSON = await necessarySignaturesForAddressResponse.json();
+        const necessarySignaturesForAddress = necessarySignaturesForAddressJSON.value;
+
+        this.setState({ transactions: transactions, necessarySignaturesForAddress: necessarySignaturesForAddress });
+    };
+
+    async deleteTransaction(tx) {
+        await this.deleteTransactionEntry(tx.id, tx.senderPublicKey);
+    }
+
     // TODO: should be changed to real deletion of the entries once we understood how to do that with signer. :)
     async deleteTransactionEntry(id, senderPublicKey) {
         const transactionCountResponse = await fetch(config.node + '/addresses/data/' + this.state.multisigAddress + '/' + id + '_count');
@@ -132,32 +159,6 @@ export default class SignStoredTransaction extends React.Component {
     }
 
     async broadcast(tx) {
-        /*const parent = this;
-        var xhr = new XMLHttpRequest();
-
-        xhr.open("POST", config.node + "/transactions/broadcast", true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.setRequestHeader("Accept", "application/json");
-
-        xhr.onreadystatechange = function() {
-            if(xhr.readyState === 4 && xhr.status === 200) {
-                const message = 'Transaction sucessfully broadcasted!';
-
-                parent.setState({ message: message, showMessageModal: true });
-                if (parent.modalRef.current) {
-                    parent.modalRef.current.activateModal(message);
-                }
-                parent.deleteTransactionEntry(tx.id, tx.senderPublicKey);
-            } else if (xhr.readyState === 4 && xhr.status >= 400) {
-                const message = JSON.parse(this.response).message;
-
-                parent.setState({ message: message, showMessageModal: true });
-                if (parent.modalRef.current) {
-                    parent.modalRef.current.activateModal(message);
-                }
-            }
-        };
-        xhr.send(JSON.stringify(tx));*/
         var message = '';
         try {
             var signer;
@@ -230,9 +231,17 @@ export default class SignStoredTransaction extends React.Component {
                     <td>
                         <Button className="me-2" id={ i } variant="primary btn-rounded" onClick={ (event) => { this.transactionSelected(tx) } }>
                             <span className="btn-icon-start text-primary">
-                                <i className="fa fa-minus" />
+                                <i className="fa fa-plus" />
                             </span>
                             Sign
+                        </Button>
+                    </td>
+                    <td>
+                        <Button className="me-2" id={ i } variant="danger btn-rounded" onClick={ (event) => { this.deleteTransaction(tx) } }>
+                            <span className="btn-icon-start text-primary">
+                                <i className="fa fa-minus" />
+                            </span>
+                            Delete
                         </Button>
                     </td>
                     <td>
@@ -261,6 +270,7 @@ export default class SignStoredTransaction extends React.Component {
                                 <th>
                                     <strong>Type</strong>
                                 </th>
+                                <th></th>
                                 <th></th>
                                 <th></th>
                             </tr>
