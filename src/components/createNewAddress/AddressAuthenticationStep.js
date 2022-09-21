@@ -7,6 +7,8 @@ import { ProviderWeb } from '@waves.exchange/provider-web';
 
 import config from '../../conf/config';
 
+import ReactTooltip from "react-tooltip";
+
 export default class AddressAuthenticationStep extends React.Component {
 
     constructor(props, context) {
@@ -54,8 +56,8 @@ export default class AddressAuthenticationStep extends React.Component {
                 <br />
                 <div className="row">
                     <div className="col-lg-4 mb-2">
-                        <div className="form-group mb-3">
-                            <label className="text-label">New multisig address</label>
+                        <div className="form-group mb-3" data-tip data-for="newAddressTip">
+                            <label className="text-label" >New multisig address</label>
                             <input
                                 type="text"
                                 name="address"
@@ -66,6 +68,11 @@ export default class AddressAuthenticationStep extends React.Component {
                                 required
                             />
                         </div>
+
+                        <ReactTooltip id="newAddressTip" place="top" effect="solid">
+                            Enter address that should be turned into multisig here
+                        </ReactTooltip>
+
                     </div>
                     <div className="col-lg-4 mb-2">
                         <div className="form-group mb-3">
@@ -81,7 +88,7 @@ export default class AddressAuthenticationStep extends React.Component {
                         </div>
                     </div>
                     <div className="col-lg-4 mb-2">
-                        <div className="form-group mb-3">
+                        <div className="form-group mb-3" data-tip data-for="newAddressTip">
                             <label className="text-label">Name</label>
                             <input
                                 type="text"
@@ -91,15 +98,23 @@ export default class AddressAuthenticationStep extends React.Component {
                                 required
                             />
                         </div>
+
+                        <ReactTooltip id="nameTip" place="top" effect="solid">
+                            Give the address a name in order to better identify it internally
+                        </ReactTooltip>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-lg-3 mb-2">
                         <div className="form-group mb-3">
-                            <Button className="me-2" variant="secondary" onClick={ () => { this.authenticateAddress(); }}>
+                            <Button className="me-2" variant="secondary" data-tip data-for="newAddressButtonTip" onClick={ () => { this.authenticateAddress(); }}>
                                 Authenticate address
                             </Button>
                         </div>
+
+                        <ReactTooltip id="newAddressButtonTip" place="top" effect="solid">
+                            Authenticate an address that should be turned into multisig
+                        </ReactTooltip>
                     </div>
                 </div>
                 <p />

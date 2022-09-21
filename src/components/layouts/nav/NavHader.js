@@ -18,12 +18,12 @@ const NavHader = () => {
         {background.value === "dark" || navigationHader !== "color_1" ? (
           <Fragment>
                 <img src={wavesafe_trans} alt="wavesafe logo" width="60px" />
-              { !toggle ? <h1>WaveSafe</h1> : "" }
+              { !toggle && window.screen.width > 768 ? <h1>WaveSafe</h1> : "" }
           </Fragment>
         ) : (
           <Fragment>
               <img src={wavesafe_trans} alt="wavesafe logo" width="60px" />
-              { !toggle ? <h1>WaveSafe</h1> : "" }
+              { !toggle && window.screen.width > 768 ? <h1>WaveSafe</h1> : "" }
           </Fragment>
         )}
       </Link>

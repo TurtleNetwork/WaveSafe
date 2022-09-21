@@ -133,6 +133,11 @@ export default class Type4TransactionForm extends React.Component {
                         type: 'integer',
                         value: parseInt(this.state.parameterValues[i])
                     };
+                } else if (parameter.type === 'Boolean') {
+                    entry = {
+                        type: 'boolean',
+                        value: this.state.parameterValues[i]
+                    };
                 }
                 args.push(entry);
                 i++;
@@ -278,6 +283,20 @@ export default class Type4TransactionForm extends React.Component {
                         required
                     />
                     <br />
+                </div>
+            } else if (parameter.type === 'Boolean') {
+                parameterEntry = <div>
+                    <label className="text-label">Parameter: {parameter.name} </label>
+                    <select
+                        defaultValue={"Select a value"}
+                        className="form-control form-control-lg"
+                        name={ i }
+                        onChange={ (event) => { this.parameterChanged(event); } }
+                    >
+                        <option value="">Select a value</option>;
+                        <option value={ true }>true</option>;
+                        <option value={ false }>false</option>;
+                    </select>
                 </div>
             }
             parameterList.push(parameterEntry);
