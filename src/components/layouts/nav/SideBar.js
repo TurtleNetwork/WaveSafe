@@ -58,7 +58,7 @@ class WalletSelector extends Component {
             className="form-control form-control-lg"
             onChange={ (event) => { this.selectWallet(event)} }
         >
-          <option value="signer">Signer</option>
+          <option value="signer">WX Seed</option>
           <option value="keeper">Keeper</option>
         </select>
     );
