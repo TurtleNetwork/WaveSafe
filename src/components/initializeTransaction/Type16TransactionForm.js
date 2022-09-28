@@ -162,7 +162,7 @@ export default class Type4TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {
@@ -178,7 +178,11 @@ export default class Type4TransactionForm extends React.Component {
             if (this.state.feeAsset !== '') {
                 invocation.feeAssetId = this.state.feeAsset;
             }
-            const signedInvocation = await signer.invoke(invocation).sign();
+            var signedInvocation = await signer.invoke(invocation).sign();
+            if (Array.isArray(signedInvocation)) {
+                signedInvocation = signedInvocation[0];
+            }
+
             this.setState({ signedTransaction: signedInvocation, showSignedTransaction: true });
         } catch(err) { }
     };
@@ -211,7 +215,7 @@ export default class Type4TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {

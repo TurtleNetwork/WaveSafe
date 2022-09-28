@@ -48,7 +48,7 @@ export default class Type4TransactionRepresentation extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {
@@ -61,11 +61,23 @@ export default class Type4TransactionRepresentation extends React.Component {
             }
             signer.setProvider(provider);
 
-            const oldId = this.state.tx.id;
+            /*const oldId = this.state.tx.id;
             const signedTransfer = await signer.transfer(this.state.tx).sign();
             signedTransfer.fee = parseInt(signedTransfer.fee);
             signedTransfer.id = oldId;
-            console.log(signedTransfer);
+            console.log(signedTransfer);*/
+            const oldId = this.state.tx.id;
+            var oldProofs = this.state.tx.proofs;
+            var signedTransfer = await signer.transfer(this.state.tx).sign();
+            if (Array.isArray(signedTransfer)) {
+                signedTransfer = signedTransfer[0];
+            }
+            signedTransfer.id = oldId;
+            if (signedTransfer.proofs.length === 1) {
+                oldProofs.push(signedTransfer.proofs[0]);
+                signedTransfer.proofs = oldProofs;
+            }
+
             this.setState({ signedTransaction: signedTransfer, showSignedTransaction: true });
         } catch(err) { }
     };
@@ -92,7 +104,7 @@ export default class Type4TransactionRepresentation extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {

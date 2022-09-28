@@ -41,7 +41,7 @@ export default class USDN extends React.Component {
             signer = new Signer();
             if (config.wallet === 'signer') {
                 provider = new ProviderWeb();
-            } else if (config.wallet = 'keeper') {
+            } else if (config.wallet === 'keeper') {
                 provider = new ProviderKeeper();
             }
         } else {
@@ -91,7 +91,7 @@ export default class USDN extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {

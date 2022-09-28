@@ -52,7 +52,7 @@ export default class Type9TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {
@@ -65,7 +65,11 @@ export default class Type9TransactionForm extends React.Component {
             }
             signer.setProvider(provider);
 
-            const signedTransfer = await signer.cancelLease(cancelLease).sign();
+            var signedTransfer = await signer.cancelLease(cancelLease).sign();
+            if (Array.isArray(signedTransfer)) {
+                signedTransfer = signedTransfer[0];
+            }
+
             this.setState({ signedTransaction: signedTransfer, showSignedTransaction: true });
         } catch(err) { }
     };
@@ -98,7 +102,7 @@ export default class Type9TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {

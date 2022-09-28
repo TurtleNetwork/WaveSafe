@@ -52,7 +52,7 @@ export default class Type6TransactionRepresentation extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {
@@ -65,9 +65,21 @@ export default class Type6TransactionRepresentation extends React.Component {
             }
             signer.setProvider(provider);
 
-            const oldId = this.state.tx.id;
+            /*const oldId = this.state.tx.id;
             const burnTransaction = await signer.burn(this.state.tx).sign();
+            burnTransaction.id = oldId;*/
+            const oldId = this.state.tx.id;
+            var oldProofs = this.state.tx.proofs;
+            var burnTransaction = await signer.burn(this.state.tx).sign();
+            if (Array.isArray(burnTransaction)) {
+                burnTransaction = burnTransaction[0];
+            }
             burnTransaction.id = oldId;
+            if (burnTransaction.proofs.length === 1) {
+                oldProofs.push(burnTransaction.proofs[0]);
+                burnTransaction.proofs = oldProofs;
+            }
+
             this.setState({ signedTransaction: burnTransaction, showSignedTransaction: true });
         } catch(err) { }
     };
@@ -100,7 +112,7 @@ export default class Type6TransactionRepresentation extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {

@@ -100,7 +100,7 @@ export default class Type11TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {
@@ -117,7 +117,11 @@ export default class Type11TransactionForm extends React.Component {
                 transfer.assetId = this.state.assetToSend;
             }
 
-            const signedMassTransfer = await signer.massTransfer(transfer).sign();
+            var signedMassTransfer = await signer.massTransfer(transfer).sign();
+            if (Array.isArray(signedMassTransfer)) {
+                signedMassTransfer = signedMassTransfer[0];
+            }
+
             this.setState({ signedTransaction: signedMassTransfer, showSignedTransaction: true });
         } catch(err) { }
     };
@@ -150,7 +154,7 @@ export default class Type11TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {

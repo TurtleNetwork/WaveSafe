@@ -83,7 +83,7 @@ export default class ContractDeploymentStep extends React.Component {
            signer = new Signer();
            if (config.wallet === 'signer') {
                provider = new ProviderWeb();
-           } else if (config.wallet = 'keeper') {
+           } else if (config.wallet === 'keeper') {
                provider = new ProviderKeeper();
            }
        } else {
@@ -98,7 +98,10 @@ export default class ContractDeploymentStep extends React.Component {
 
 
        try {
-           const setScriptTx = await signer.setScript(data).broadcast();
+           var setScriptTx = await signer.setScript(data).broadcast();
+           if (Array.isArray(setScriptTx)) {
+               setScriptTx = setScriptTx[0];
+           }
            const txData = [
                { key: 'publicKey', type: 'string', value: setScriptTx.senderPublicKey },
                { key: 'necessarySignatures', type: 'integer', value: this.parentState.minSignatures }
@@ -108,6 +111,7 @@ export default class ContractDeploymentStep extends React.Component {
                data: txData,
                fee: 500000
            };
+           console.log(tx);
            await signer.data(tx).broadcast();
        } catch (err) {
            this.setState({ message: err.message, showMessageModal: true });

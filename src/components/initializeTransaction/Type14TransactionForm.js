@@ -68,7 +68,7 @@ export default class Type14TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {
@@ -81,7 +81,11 @@ export default class Type14TransactionForm extends React.Component {
             }
             signer.setProvider(provider);
 
-            const signedSponsoring = await signer.sponsorship(sponsor).sign();
+            var signedSponsoring = await signer.sponsorship(sponsor).sign();
+            if (Array.isArray(signedSponsoring)) {
+                signedSponsoring = signedSponsoring[0];
+            }
+
             this.setState({ signedTransaction: signedSponsoring, showSignedTransaction: true });
         } catch(err) { }
     };
@@ -114,7 +118,7 @@ export default class Type14TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {

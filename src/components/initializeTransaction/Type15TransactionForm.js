@@ -80,7 +80,7 @@ export default class Type15TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {
@@ -93,7 +93,11 @@ export default class Type15TransactionForm extends React.Component {
             }
             signer.setProvider(provider);
 
-            const signedSetAssetScript = await signer.setAssetScript(setAssetScript).sign();
+            var signedSetAssetScript = await signer.setAssetScript(setAssetScript).sign();
+            if (Array.isArray(signedSetAssetScript)) {
+                signedSetAssetScript = signedSetAssetScript[0];
+            }
+
             this.setState({ signedTransaction: signedSetAssetScript, showSignedTransaction: true });
         } catch(err) { }
     };
@@ -126,7 +130,7 @@ export default class Type15TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {

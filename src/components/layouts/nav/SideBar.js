@@ -41,9 +41,9 @@ class NetworkSelector extends Component {
 
 class WalletSelector extends Component {
 
-  constructor() {
+  /*constructor() {
     super();
-  }
+  }*/
 
   selectWallet(event) {
     const selectedWallet = event.target.value;

@@ -118,7 +118,7 @@ export default class Type4TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {
@@ -139,7 +139,10 @@ export default class Type4TransactionForm extends React.Component {
                 transfer.assetId = this.state.assetToSend;
             }
 
-            const signedTransfer = await signer.transfer(transfer).sign();
+            var signedTransfer = await signer.transfer(transfer).sign();
+            if (Array.isArray(signedTransfer)) {
+                signedTransfer = signedTransfer[0];
+            }
             // strange enough: seems like signer is changing data type to string for fee!
             signedTransfer.fee = parseInt(this.state.fee);
             this.setState({ signedTransaction: signedTransfer, showSignedTransaction: true });
@@ -174,7 +177,7 @@ export default class Type4TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {

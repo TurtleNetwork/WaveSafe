@@ -98,6 +98,7 @@ export default class SignStoredTransaction extends React.Component {
     async multisigWalletSelected(event) {
         const dataProtocol = new WavesDataProtocol();
         const address = event.target.value;
+        console.log(address);
         const transactions = await dataProtocol.getTransactionsForAddress(address);
         const necessarySignaturesForAddressResponse = await fetch(config.node + '/addresses/data/' + address + '/necessarySignatures');
         const necessarySignaturesForAddressJSON = await necessarySignaturesForAddressResponse.json();
@@ -123,8 +124,8 @@ export default class SignStoredTransaction extends React.Component {
 
     // TODO: should be changed to real deletion of the entries once we understood how to do that with signer. :)
     async deleteTransactionEntry(id, senderPublicKey) {
-        const transactionCountResponse = await fetch(config.node + '/addresses/data/' + this.state.multisigAddress + '/' + id + '_count');
-        const transactionCountJSON = await transactionCountResponse.json();
+        //const transactionCountResponse = await fetch(config.node + '/addresses/data/' + this.state.multisigAddress + '/' + id + '_count');
+        //const transactionCountJSON = await transactionCountResponse.json();
         //const transactionCount = transactionCountJSON.value;
 
         try {
@@ -157,7 +158,7 @@ export default class SignStoredTransaction extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {
@@ -192,7 +193,7 @@ export default class SignStoredTransaction extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {
@@ -205,7 +206,7 @@ export default class SignStoredTransaction extends React.Component {
             }
             signer.setProvider(provider);
 
-            const result = await signer.broadcast(tx);
+            await signer.broadcast(tx);
 
             message = 'Transaction sucessfully broadcasted!';
         } catch(err) {

@@ -70,7 +70,7 @@ export default class Type6TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {
@@ -83,7 +83,11 @@ export default class Type6TransactionForm extends React.Component {
             }
             signer.setProvider(provider);
 
-            const signedBurn = await signer.burn(burn).sign();
+            var signedBurn = await signer.burn(burn).sign();
+            if (Array.isArray(signedBurn)) {
+                signedBurn = signedBurn[0];
+            }
+
             this.setState({ signedTransaction: signedBurn, showSignedTransaction: true });
         } catch(err) { }
     };
@@ -116,7 +120,7 @@ export default class Type6TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {

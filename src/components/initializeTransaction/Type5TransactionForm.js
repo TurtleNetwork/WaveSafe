@@ -84,7 +84,7 @@ export default class Type5TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {
@@ -97,7 +97,11 @@ export default class Type5TransactionForm extends React.Component {
             }
             signer.setProvider(provider);
 
-            const signedReIssue = await signer.reissue(reIssue).sign();
+            var signedReIssue = await signer.reissue(reIssue).sign();
+            if (Array.isArray(signedReIssue)) {
+                signedReIssue = signedReIssue[0];
+            }
+
             this.setState({ signedTransaction: signedReIssue, showSignedTransaction: true });
         } catch(err) { }
     };
@@ -130,7 +134,7 @@ export default class Type5TransactionForm extends React.Component {
                 signer = new Signer();
                 if (config.wallet === 'signer') {
                     provider = new ProviderWeb();
-                } else if (config.wallet = 'keeper') {
+                } else if (config.wallet === 'keeper') {
                     provider = new ProviderKeeper();
                 }
             } else {
