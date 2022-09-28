@@ -22,6 +22,7 @@ import { Button, Table } from "react-bootstrap";
 import config from '../../conf/config';
 
 import MessageModal from '../modals/MessageModal';
+import {ProviderKeeper} from "@waves/provider-keeper";
 
 export default class SignStoredTransaction extends React.Component {
 
@@ -144,13 +145,30 @@ export default class SignStoredTransaction extends React.Component {
                 data: txData
             };
             var signer;
-            if (config.provider === '') {
+            /*if (config.provider === '') {
                 signer = new Signer();
                 signer.setProvider(new ProviderWeb());
             } else {
                 signer = new Signer({ NODE_URL: config.node });
                 signer.setProvider(new ProviderWeb(config.provider));
+            }*/
+            var provider;
+            if (config.provider === '') {
+                signer = new Signer();
+                if (config.wallet === 'signer') {
+                    provider = new ProviderWeb();
+                } else if (config.wallet = 'keeper') {
+                    provider = new ProviderKeeper();
+                }
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                if (config.wallet === 'signer') {
+                    provider = new ProviderWeb(config.provider);
+                } else if (config.wallet === 'keeper') {
+                    provider = new ProviderKeeper();
+                }
             }
+            signer.setProvider(provider);
 
             await signer.data(tx).broadcast();
         } catch(err) {
@@ -162,13 +180,31 @@ export default class SignStoredTransaction extends React.Component {
         var message = '';
         try {
             var signer;
-            if (config.provider === '') {
+            /*if (config.provider === '') {
                 signer = new Signer();
                 signer.setProvider(new ProviderWeb());
             } else {
                 signer = new Signer({ NODE_URL: config.node });
                 signer.setProvider(new ProviderWeb(config.provider));
+            }*/
+            var provider;
+            if (config.provider === '') {
+                signer = new Signer();
+                if (config.wallet === 'signer') {
+                    provider = new ProviderWeb();
+                } else if (config.wallet = 'keeper') {
+                    provider = new ProviderKeeper();
+                }
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                if (config.wallet === 'signer') {
+                    provider = new ProviderWeb(config.provider);
+                } else if (config.wallet === 'keeper') {
+                    provider = new ProviderKeeper();
+                }
             }
+            signer.setProvider(provider);
+
             const result = await signer.broadcast(tx);
 
             message = 'Transaction sucessfully broadcasted!';

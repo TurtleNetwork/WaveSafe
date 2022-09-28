@@ -8,6 +8,7 @@ import { ProviderWeb } from '@waves.exchange/provider-web';
 import config from '../../conf/config';
 
 import MessageModal from '../modals/MessageModal';
+import {ProviderKeeper} from "@waves/provider-keeper";
 
 export default class ContractDeploymentStep extends React.Component {
 
@@ -70,13 +71,31 @@ export default class ContractDeploymentStep extends React.Component {
    async deployContract(compiledContract) {
        const data = { script: compiledContract};
        var signer;
-       if (config.provider === '') {
+       /*if (config.provider === '') {
            signer = new Signer();
            signer.setProvider(new ProviderWeb());
        } else {
            signer = new Signer({ NODE_URL: config.node });
            signer.setProvider(new ProviderWeb(config.provider));
+       }*/
+       var provider;
+       if (config.provider === '') {
+           signer = new Signer();
+           if (config.wallet === 'signer') {
+               provider = new ProviderWeb();
+           } else if (config.wallet = 'keeper') {
+               provider = new ProviderKeeper();
+           }
+       } else {
+           signer = new Signer({ NODE_URL: config.node });
+           if (config.wallet === 'signer') {
+               provider = new ProviderWeb(config.provider);
+           } else if (config.wallet === 'keeper') {
+               provider = new ProviderKeeper();
+           }
        }
+       signer.setProvider(provider);
+
 
        try {
            const setScriptTx = await signer.setScript(data).broadcast();

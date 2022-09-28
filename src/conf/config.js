@@ -2,11 +2,12 @@ var config = {
   // testnet config
   node: 'https://nodes-testnet.wavesnodes.com',
   provider: 'https://testnet.waves.exchange/signer/',
-  network: 'Testnet'
+  network: 'Testnet',
   // mainnet config
   //node: 'https://nodes.wavesexplorer.com',
   //provider: '',
-  //network: 'Mainnet'
+  //network: 'Mainnet',
+  wallet: 'signer'
 };
 
 export default config;

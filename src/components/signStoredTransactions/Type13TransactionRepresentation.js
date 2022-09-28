@@ -10,6 +10,7 @@ import config from '../../conf/config';
 import WavesDataProtocol from '../../dataProtocol/WavesDataProtocol';
 
 import MessageModal from '../modals/MessageModal';
+import {ProviderKeeper} from "@waves/provider-keeper";
 
 export default class Type13TransactionRepresentation extends React.Component {
 
@@ -34,13 +35,30 @@ export default class Type13TransactionRepresentation extends React.Component {
     async signTransaction() {
         try {
             var signer;
-            if (config.provider === '') {
+            /*if (config.provider === '') {
                 signer = new Signer();
                 signer.setProvider(new ProviderWeb());
             } else {
                 signer = new Signer({ NODE_URL: config.node });
                 signer.setProvider(new ProviderWeb(config.provider));
+            }*/
+            var provider;
+            if (config.provider === '') {
+                signer = new Signer();
+                if (config.wallet === 'signer') {
+                    provider = new ProviderWeb();
+                } else if (config.wallet = 'keeper') {
+                    provider = new ProviderKeeper();
+                }
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                if (config.wallet === 'signer') {
+                    provider = new ProviderWeb(config.provider);
+                } else if (config.wallet === 'keeper') {
+                    provider = new ProviderKeeper();
+                }
             }
+            signer.setProvider(provider);
 
             const oldId = this.state.tx.id;
             const setScript = await signer.setScript(this.state.tx).sign();
@@ -65,13 +83,30 @@ export default class Type13TransactionRepresentation extends React.Component {
                 data: txData
             };
             var signer;
-            if (config.provider === '') {
+            /*if (config.provider === '') {
                 signer = new Signer();
                 signer.setProvider(new ProviderWeb());
             } else {
                 signer = new Signer({ NODE_URL: config.node });
                 signer.setProvider(new ProviderWeb(config.provider));
+            }*/
+            var provider;
+            if (config.provider === '') {
+                signer = new Signer();
+                if (config.wallet === 'signer') {
+                    provider = new ProviderWeb();
+                } else if (config.wallet = 'keeper') {
+                    provider = new ProviderKeeper();
+                }
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                if (config.wallet === 'signer') {
+                    provider = new ProviderWeb(config.provider);
+                } else if (config.wallet === 'keeper') {
+                    provider = new ProviderKeeper();
+                }
             }
+            signer.setProvider(provider);
 
             await signer.data(tx).broadcast();
         } catch(err) {

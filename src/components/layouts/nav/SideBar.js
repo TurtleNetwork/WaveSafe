@@ -39,6 +39,33 @@ class NetworkSelector extends Component {
 
 }
 
+class WalletSelector extends Component {
+
+  constructor() {
+    super();
+  }
+
+  selectWallet(event) {
+    const selectedWallet = event.target.value;
+
+    config.wallet = selectedWallet;
+  };
+
+  render() {
+    return (
+        <select
+            defaultValue="signer"
+            className="form-control form-control-lg"
+            onChange={ (event) => { this.selectWallet(event)} }
+        >
+          <option value="signer">Signer</option>
+          <option value="keeper">Keeper</option>
+        </select>
+    );
+  };
+
+}
+
 class MM extends Component {
   componentDidMount() {
     this.$el = this.el;
@@ -141,7 +168,9 @@ const SideBar = () => {
               </li>
             </ul>
           </li>
-
+          <li>
+            <WalletSelector />
+          </li>
         </MM>
 
       </PerfectScrollbar>

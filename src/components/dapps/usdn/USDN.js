@@ -16,6 +16,7 @@ import StakeNSBT from './StakeNSBT';
 import BuyNSBT from './BuyNSBT';
 import BuySURF from "./BuySURF";
 import StakeSURF from "./StakeSURF";
+import {ProviderKeeper} from "@waves/provider-keeper";
 
 export default class USDN extends React.Component {
 
@@ -28,13 +29,30 @@ export default class USDN extends React.Component {
 
     async signTransaction() {
         var signer;
-        if (config.provider === '') {
+        /*if (config.provider === '') {
             signer = new Signer();
             signer.setProvider(new ProviderWeb());
         } else {
             signer = new Signer({ NODE_URL: config.node });
             signer.setProvider(new ProviderWeb(config.provider));
+        }*/
+        var provider;
+        if (config.provider === '') {
+            signer = new Signer();
+            if (config.wallet === 'signer') {
+                provider = new ProviderWeb();
+            } else if (config.wallet = 'keeper') {
+                provider = new ProviderKeeper();
+            }
+        } else {
+            signer = new Signer({ NODE_URL: config.node });
+            if (config.wallet === 'signer') {
+                provider = new ProviderWeb(config.provider);
+            } else if (config.wallet === 'keeper') {
+                provider = new ProviderKeeper();
+            }
         }
+        signer.setProvider(provider);
 
         const signedTransaction = await signer.transfer(JSON.parse(this.state.jsonTransaction)).sign();
         // strange enough: seems like signer is changing data type to string for fee!
@@ -61,13 +79,31 @@ export default class USDN extends React.Component {
                 data: txData
             };
             var signer;
-            if (config.provider === '') {
+            /*if (config.provider === '') {
                 signer = new Signer();
                 signer.setProvider(new ProviderWeb());
             } else {
                 signer = new Signer({ NODE_URL: config.node });
                 signer.setProvider(new ProviderWeb(config.provider));
+            }*/
+            var provider;
+            if (config.provider === '') {
+                signer = new Signer();
+                if (config.wallet === 'signer') {
+                    provider = new ProviderWeb();
+                } else if (config.wallet = 'keeper') {
+                    provider = new ProviderKeeper();
+                }
+            } else {
+                signer = new Signer({ NODE_URL: config.node });
+                if (config.wallet === 'signer') {
+                    provider = new ProviderWeb(config.provider);
+                } else if (config.wallet === 'keeper') {
+                    provider = new ProviderKeeper();
+                }
             }
+            signer.setProvider(provider);
+
 
             await signer.data(tx).broadcast();
         } catch(err) {

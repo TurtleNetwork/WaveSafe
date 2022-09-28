@@ -4,6 +4,7 @@ import { Button } from "react-bootstrap";
 
 import { Signer } from '@waves/signer';
 import { ProviderWeb } from '@waves.exchange/provider-web';
+import { ProviderKeeper } from '@waves/provider-keeper';
 
 import config from '../../conf/config';
 
@@ -22,13 +23,30 @@ export default class AddressAuthenticationStep extends React.Component {
 
     async authenticateAddress() {
         var signer;
-        if (config.provider === '') {
+/*        if (config.provider === '') {
             signer = new Signer();
             signer.setProvider(new ProviderWeb());
         } else {
             signer = new Signer({ NODE_URL: config.node });
             signer.setProvider(new ProviderWeb(config.provider));
+        }*/
+        var provider;
+        if (config.provider === '') {
+            signer = new Signer();
+            if (config.wallet === 'signer') {
+                provider = new ProviderWeb();
+            } else if (config.wallet = 'keeper') {
+                provider = new ProviderKeeper();
+            }
+        } else {
+            signer = new Signer({ NODE_URL: config.node });
+            if (config.wallet === 'signer') {
+                provider = new ProviderWeb(config.provider);
+            } else if (config.wallet === 'keeper') {
+                provider = new ProviderKeeper();
+            }
         }
+        signer.setProvider(provider);
 
         const loginData = await signer.login();
         const address = loginData.address;
