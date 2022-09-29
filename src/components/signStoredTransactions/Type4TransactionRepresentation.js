@@ -117,7 +117,6 @@ export default class Type4TransactionRepresentation extends React.Component {
             }
             signer.setProvider(provider);
 
-            signer.setProvider(new ProviderWeb(config.provider));
 
             await signer.data(tx).broadcast();
         } catch(err) {
