@@ -106,7 +106,7 @@ export default class AddressAuthenticationStep extends React.Component {
                         </div>
                     </div>
                     <div className="col-lg-4 mb-2">
-                        <div className="form-group mb-3" data-tip data-for="newAddressTip">
+                        <div className="form-group mb-3" data-tip data-for="nameTip">
                             <label className="text-label">Name</label>
                             <input
                                 type="text"
